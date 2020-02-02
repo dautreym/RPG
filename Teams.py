@@ -446,7 +446,7 @@ class Equipe:
         return fin
         
     ''' IDEE : RETENIR LES INDICES DE STOCKAGE DAND LA BASE DE L EQUIPE AVANT COMBAT '''
-    ''' APRES FIN DU CMBAT, RECONSTITUER EQUIPE => PAS BESOIN DE FAIRE GAFFE AUX .pop '''
+    ''' APRES FIN DU COMBAT, RECONSTITUER EQUIPE => PAS BESOIN DE FAIRE GAFFE AUX .pop '''
     def combat_xVx_avec_capacites_speciales(self,ennemis):
         ''' Créer tous les Anti Passifs... '''
         passifs_debut_de_partie=[Chevalier.chevalerie,Serpent.coupe_feu,Griffon.bouclier_lumiere,Griffon.bouclier_tenebres,LoupGarou.soif_de_sang]
@@ -456,7 +456,6 @@ class Equipe:
             self.membres[0].leader_skill(self)
         if(ennemis.membres[0].presence_leader_skill == 1):
             ennemis.membres[0].leader_skill(ennemis)
-        
         
         ''' Pour l'instant, aucun passif_2 dans les passifs de début de partie '''
         for index in range(self.len):
@@ -470,10 +469,13 @@ class Equipe:
                     ennemis.membres[index].passif_1()
 
         persos=self.membres + ennemis.membres
-        for index in range(len(persos)):
+        index=0
+        while(index < len(persos)):
+            # len(persos) peut être modifié par les .pop
             if(index < len(persos) and persos[index] == 0):
                 persos.pop(index)
                 index-=1
+            index+=1
 
 
         while(not self.fin_du_combat(ennemis)):

@@ -323,28 +323,28 @@ class Game:
         if(self.niveaux_donjons_debloques[self.choix_map] < 7):
             self.niveaux_donjons_debloques[self.choix_map]+=1
         else:
-            if(self.niveau_donjon[0] == 'la Forêt Veur Niveau 7 - Clairière ' and 'Cratère Ater' not in self.noms_donjons_dispo):
+            if(self.niveau_donjon.nom == 'la Forêt Veur Niveau 7 - Clairière ' and 'Cratère Ater' not in self.noms_donjons_dispo):
                 self.niveaux_donjons_debloques.append(1)
+                self.donjons_dispo.append(CratereAter())
                 self.noms_donjons_dispo.append('Cratère Ater')
                 print('Une nouvelle zone devient diponible : le Cratère Ater!! \n')
-            if(self.niveau_donjon[0] == 'le Cratère Ater Niveau 7 - Caverne des Profondeurs ' and 'Mont Tagne' not in self.noms_donjons_dispo):
+            if(self.niveau_donjon.nom == 'le Cratère Ater Niveau 7 - Caverne des Profondeurs ' and 'Mont Tagne' not in self.noms_donjons_dispo):
                 self.niveaux_donjons_debloques.append(1)
+                self.donjons_dispo.append(MontTagne())
                 self.noms_donjons_dispo.append('Mont Tagne')
                 print('Une nouvelle zone devient diponible : le Mont Tagne!! \n')
-            if(self.niveau_donjon[0] == 'le Mont Tagne Niveau 7 - Caverne au Sommet ' and 'Ruines de Senzargen' not in self.noms_donjons_dispo):
+            if(self.niveau_donjon.nom == 'le Mont Tagne Niveau 7 - Caverne au Sommet ' and 'Ruines de Senzargen' not in self.noms_donjons_dispo):
                 self.niveaux_donjons_debloques.append(1)
+                self.donjons_dispo.append(RuinesSenzargen())
                 self.noms_donjons_dispo.append('Ruines de Senzargen')
                 print('Une nouvelle zone devient diponible : les Ruines de Senzargen!! \n')
-            if(self.niveau_donjon[0] == 'les Ruines de Senzargen Niveau 7 - Autel Sacrificiel '):
+            if(self.niveau_donjon.nom == 'les Ruines de Senzargen Niveau 7 - Autel Sacrificiel '):
                 print('Félicitations!! Vous avez terminé le jeu!! \n')
             str(input(' > '))
         # DEBLOQUER LES DONJONS EN FONCTION DE LA DIFFICULTE DU PRECEDENT
 
 
 
-
-
-# SELF SOIT TOUJOURS ETRE EN PREMIER DANS LES ARGUMENTS D'INSTANCE DE CLASSE !!!!
     def combat_donjon(self,equipe_allies):
         self.niveau_donjon.position()
         '''
@@ -354,7 +354,6 @@ class Game:
         if(equipe_allies.membre_2!=0):
             equipe_allies_tmp.append(equipe_allies.membre_2)
         '''
-        
         
         equipe_ennemis=self.niveau_donjon.monstres_region(self)
                 
@@ -437,32 +436,31 @@ class Game:
 
                 if(self.niveau_donjon.niveau==7):
                     '''[recompenses_donnees,recompenses_globales,types_recompenses_globales]'''
-                    if(recompenses_globales_totales[0][self.choix_map]==0):
+                    if(self.recompenses_globales_totales[0][self.choix_map]==0):
                         print('Vous recevez une récompense exclusive pour avoir terminé ',self.niveau_donjon.nom,'pour la première fois!!')
 
-                        if(recompenses_globales_totales[2][self.choix_map]=='Monstre'):
+                        if(self.recompenses_globales_totales[2][self.choix_map]=='Monstre'):
                             print('Vous recevez : \n')
                             #print(recompenses_globales_totales)
-                            print(recompenses_globales_totales[1][self.choix_map])
-                            Base.ajouter_monstre(base,recompenses_globales_totales[1][self.choix_map])
+                            print(self.recompenses_globales_totales[1][self.choix_map])
+                            self.ajouter_monstre(self.recompenses_globales_totales[1][self.choix_map])
                         
-                        elif(recompenses_globales_totales[2][self.choix_map]=='Monstres'):
-                            print(recompenses_globales_totales)
-                            for index in range(len(recompenses_globales_totales[1][self.choix_map])):
+                        elif(self.recompenses_globales_totales[2][self.choix_map]=='Monstres'):
+                            for index in range(len(self.recompenses_globales_totales[1][self.choix_map])):
                                 print('Vous recevez : \n')
                                 str(input(' > '))
-                                print(recompenses_globales_totales[1][self.choix_map][index])
-                                self.ajouter_monstre(self,recompenses_globales_totales[1][self.choix_map][index])
+                                print(self.recompenses_globales_totales[1][self.choix_map][index])
+                                self.ajouter_monstre(self.recompenses_globales_totales[1][self.choix_map][index])
                         
-                        elif(recompenses_globales_totales[2][self.choix_map]=='Runes'):
-                            for index in range(len(recompenses_globales_totales[1][self.choix_map])):
+                        elif(self.recompenses_globales_totales[2][self.choix_map]=='Runes'):
+                            for index in range(len(self.recompenses_globales_totales[1][self.choix_map])):
                                 print('Vous recevez : \n')
                                 str(input(' > '))
-                                print(recompenses_globales_totales[1][self.choix_map][index])
-                                self.sac.ajouter_objet(recompenses_globales_totales[1][self.choix_map][index])
+                                print(self.recompenses_globales_totales[1][self.choix_map][index])
+                                self.sac.ajouter_objet(self.recompenses_globales_totales[1][self.choix_map][index])
                         
                         str(input(' > '))
-                        recompenses_globales_totales[0][self.choix_map]=1
+                        self.recompenses_globales_totales[0][self.choix_map]=1
 
                 self.rentrer_de_donjon(equipe_allies)
             else:
@@ -470,7 +468,7 @@ class Game:
         else:
             ''' FAIRE UNE RECOMPENSE PARTIELLE EN XP ET EN MANA '''
             print('Vous avez perdu... \n\n\n\n')
-            equipe_enemis.soigner_team_ennemie()
+            equipe_ennemis.soigner_team_ennemie()
 
             '''
             equipe_allies=[allie1]
@@ -479,7 +477,7 @@ class Game:
             if(allie3!=0):
                 equipe_allies.append(allie3)
             '''
-            self.niveau_donjon.rentrer(self,equipe_allies)
+            self.rentrer_de_donjon(equipe_allies)
 
 
 
@@ -648,8 +646,7 @@ class Game:
 
         if (choix == 2):
             possibilites_choix_map=[]
-            possibilites_choix_niveau=[]
-            
+            possibilites_choix_niveau=[]           
             print('\nVoici la liste des lieux accessibles : ')
             for index in range(len(self.noms_donjons_dispo)):
                 print(self.noms_donjons_dispo[index],' = ',index)

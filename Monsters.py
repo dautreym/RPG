@@ -22,7 +22,7 @@ from Functions import *
 from Inventory_and_Teams import *
 from Runes_and_Objects import *
 '''
-
+# CORIIGER LES .POP!!!!
 
 class Monstre:
     def __init__(self, nom_donne, attribut_donne, classe_donnee, niveau_donne, pv_donnes, pv_actuels_donnes, attaque_donnee, defense_donnee, vitesse_donnee):
@@ -2242,8 +2242,8 @@ class Monstre:
                             capacite_choisie=self.choisir_capacite_speciale_sans_affichage()
                             if((capacite_choisie not in capacites_anormales) or (capacite_choisie in capacites_soin_allie_avec_hit) or (capacite_choisie in capacites_attaque_en_groupe) or (capacite_choisie in capacites_hit_multicibles)):
                                 possibilites_cible=[]
-                                for index in range(team_ennemis.len):
-                                    if(team_ennemis.membres[index].pv_actuels > 0):
+                                for index in range(team_allies.len):
+                                    if(team_allies.membres[index].pv_actuels > 0):
                                         possibilites_cible.append(index)
                                 indice_cible=possibilites_cible[random.randint(0,len(possibilites_cible)-1)]
                                 cible_allie=team_allies.membres[indice_cible]
@@ -2295,9 +2295,10 @@ class Monstre:
                                     possibilites_choix_allie=[]
                                     for index in range(team_ennemis.len):
                                         if(team_ennemis.membres[index].pv_actuels > 0):
-                                            print('Il reste ',team_allies.membres[index].pv_actuels,' PV à l allié ',index,':',team_allies.membres[index].surnom,team_allies.membres[index].attribut,' sur ',team_allies.membres[index].pv_max_donjons)
                                             possibilites_choix_allie.append(index)
                                     
+                                    # ATTENTION 
+                                    # ici cible_allie fait référence à un allié de l'attaquant = un ennemi
                                     choix=possibilites_choix_allie[random.randint(0,len(possibilites_choix_allie)-1)]
                                     cible_allie=team_ennemis.membres[choix]
                                         
@@ -2522,7 +2523,7 @@ class Monstre:
             self.sommeil=1
             self.tours_sommeil=max(self.tours_sommeil,nb_tours)
 
-    def perturbation_recup(self,nb_tours):
+    def perturbation_recuperation(self,nb_tours):
         if(self.immunite <= 0):
             print(self.surnom,self.attribut,' voit sa récupération de points de vie perturbée pour ',nb_tours,' tour(s)!! \n')
             self.perturbation_recup=1
@@ -2794,7 +2795,8 @@ class Monstre:
 
     def preparer_au_combat(self):
         if(self!=0):
-            self.actualiser_stats_de_listes_a_simples() # Corrige les bonus_de_runes_en_pv et autres
+            self.actualiser_stats_de_simples_a_listes()
+            #self.actualiser_stats_de_listes_a_simples() # Corrige les bonus_de_runes_en_pv et autres
             self.initialiser_stats_max_donjons() # Réinitialise les stats max donjons = pas de cumulation
 
             self.pv_max_donjons+=self.bonus_de_runes_en_pv
@@ -4965,7 +4967,7 @@ class BoiteDePandore(Monstre):
             effet_nefaste=random.randint(1,100)
             limite_reussite=Calcul.taux_reussite_effet(0.5,cible.resistance_actuelle,self.precision_actuelle)
             if(effet_nefaste <= 100*limite_reussite):
-                self.retirer_un_bonus(cible)
+                cible.retirer_un_bonus()
 
 
 class SoldatSquelette(Monstre):
@@ -5113,10 +5115,12 @@ class SoldatSquelette(Monstre):
                 print(equipe_ennemie.membres[index].surnom,equipe_ennemie.membres[index].attribut,' reçoit l\'attaque circulaire!!')
                 degats=self.calcul_dommages(2.4,self.capacite2_bonus_skill,equipe_ennemie.membres[index])
                 self.affichage_du_type_de_coup(2.4,self.capacite2_bonus_skill,degats,equipe_ennemie.membres[index])
-                degats=self.reduction_dommages(equipe_ennemie.membres[index],degats)
+                degats=equipe_ennemie.membres[index].reduction_dommages(degats)
                 self.procedure_attaque(degats,equipe_ennemie.membres[index])
                 if(self.priorite_elementaire(equipe_ennemie.membres[index])):
-                    self.perturbation_recup(equipe_ennemie.membres[index],2)
+                    print(equipe_ennemie.membres,'\n',index,'\n\n')
+                    print(equipe_ennemie.membres[index] == 0,'\n\n')
+                    equipe_ennemie.membres[index].perturbation_recuperation(2)
 
 
 class ChauveSouris(Monstre):
@@ -5264,7 +5268,7 @@ class ChauveSouris(Monstre):
                 print(equipe_ennemie.membres[index].surnom,equipe_ennemie.membres[index].attribut,'reçoit les ultrasons!!')
                 degats=self.calcul_dommages(3.2,self.capacite2_bonus_skill,equipe_ennemie.membres[index])
                 self.affichage_du_type_de_coup(3.2,self.capacite2_bonus_skill,degats,equipe_ennemie.membres[index])
-                degats=self.reduction_dommages(equipe_ennemie.membres[index],degats)
+                degats=equipe_ennemie.membres[index].reduction_dommages(degats)
                 self.procedure_attaque(degats,equipe_ennemie.membres[index])
                 if(equipe_ennemie.membres[index].immunite == 0):
                     effet_nefaste=random.randint(1,100)
@@ -5503,7 +5507,7 @@ class Imp(Monstre):
             self.capacite1=Imp.lance
             self.capacite_nNom='Coup de Lance'
             self.capacite1_bonus_skill=0
-            self.tempsrecharge1=1
+            self.temps_recharge1=1
             self.attente1=0
             self.etat_cap1='dispo'
 
@@ -5675,7 +5679,7 @@ class Imp(Monstre):
         degats=cible.reduction_dommages(degats)
         self.procedure_attaque(degats,cible)
         if(type_coup=='Critique'):
-            self.speed_up(self,2)
+            self.speed_up(2)
 
     def sphere_infernale(self,cible):
         print('\n',self.surnom,self.attribut,' projette une sphère infernale sur ',cible.surnom,cible.attribut,'!!\n')
@@ -5980,7 +5984,7 @@ class Lutin(Monstre):
                 print(equipe_ennemie.membres[index].surnom,equipe_ennemie.membres[index].attribut,'reçoit le sort de décélération!!')
                 degats=self.calcul_dommages(2.1,self.capacite2_bonus_skill,equipe_ennemie.membres[index])
                 self.affichage_du_type_de_coup(2.1,self.capacite2_bonus_skill,degats,equipe_ennemie.membres[index])
-                degats=self.reduction_dommages(equipe_ennemie.membres[index],degats)
+                degats=equipe_ennemie.membres[index].reduction_dommages(degats)
                 self.procedure_attaque(degats,equipe_ennemie.membres[index])
                 if(equipe_ennemie.membres[index].immunite==0):
                     effet_nefaste=random.randint(1,100)
@@ -6568,7 +6572,7 @@ class Cerbere(Monstre):
         degats=2*(140+self.vitesse_actuelle+self.capacite2_bonus_skill)
         degats=cible.reduction_dommages(degats)
         self.procedure_attaque(degats,cible)
-        self.speed_up(self,2)
+        self.speed_up(2)
 
 
 class OursDeGuerre(Monstre):
@@ -6838,13 +6842,13 @@ class OursDeGuerre(Monstre):
             if (equipe_ennemie.membres[index].pv_actuels>0):
                 print(equipe_ennemie.membres[index].surnom,equipe_ennemie.membres[index].attribut,'reçoit le rugissement!!')
                 degats=Arrondir.a_l_unite(0.2*self.pv_max_donjons)
-                degats=self.reduction_dommages(equipe_ennemie.membres[index],degats)
+                degats=equipe_ennemie.membres[index].reduction_dommages(degats)
                 self.procedure_attaque(degats,equipe_ennemie.membres[index])
                 if(equipe_ennemie.membres[index].immunite==0):
                     effet_nefaste=random.randint(1,100)
                     limite_reussite=Calcul.taux_reussite_effet(1,equipe_ennemie.membres[index].resistance_actuelle,self.precision_actuelle)
                     if(effet_nefaste<=100*limite_reussite):
-                        self.atk_break(equipe_ennemie.membres[index],2)
+                        equipe_ennemie.membres[index].atk_break(2)
 
     def abnegation(self):
         if(self.pv_actuels>0):
@@ -6855,7 +6859,7 @@ class OursDeGuerre(Monstre):
             else:
                 print('La récupération de points de vie de ',self.surnom,self.attribut,' est actuellement entravée!! \n')
             print('Il reste ',self.pv_actuels,' point(s) de vie sur',self.pv_max_donjons,' à ',self.surnom,self.attribut,'!! \n')
-            self.tanky(self,2)
+            self.tanky(2)
 
 
 class Elementaire(Monstre):
@@ -7124,8 +7128,8 @@ class Elementaire(Monstre):
 
     def renforcement(self):
         print('\n',self.surnom,self.attribut,' se renforce avec de l énergie naturelle!!\n')
-        self.rise(self,3)
-        self.espada(self,3)
+        self.rise(3)
+        self.espada(3)
 
 
 class Garuda(Monstre):
@@ -7441,8 +7445,8 @@ class Garuda(Monstre):
 
     def resurgir(allie):
         print('\n',allie.surnom,allie.attribut,'reçoit un tour supplémentaire!!')
-        self.rise(allie,1)
-        self.espada(allie,1)
+        allie.rise(1)
+        allie.espada(1)
         allie.jauge_attaque+=100
 
     def lumiere(equipe_alliee):
@@ -7471,10 +7475,10 @@ class Garuda(Monstre):
                 while(not Security.is_decimal(entree)):
                     entree=input('Qui voulez-vous ramener à la vie ? ')
                 choix_resurrection=int(entree)
-            print(equipe_alliee[choix_resurrection].surnom,equipe_alliee[choix_resurrection].attribut,' revient à la vie!! \n')
-            equipe_alliee[choix_resurrection].pv_actuels=Arrondir.a_l_unite(0.2*equipe_alliee.membres[index].pv_max_donjons)
-            equipe_alliee[choix_resurrection].soigner_de_tous_les_maux()
-            equipe_alliee[choix_resurrection].etat='vivant'
+            print(equipe_alliee.membres[choix_resurrection].surnom,equipe_alliee.membres[choix_resurrection].attribut,' revient à la vie!! \n')
+            equipe_alliee.membres[choix_resurrection].pv_actuels=Arrondir.a_l_unite(0.2*equipe_alliee.membres[index].pv_max_donjons)
+            equipe_alliee.membres[choix_resurrection].soigner_de_tous_les_maux()
+            equipe_alliee.membres[choix_resurrection].etat='vivant'
 
 
 class Harpie(Monstre):
@@ -7770,7 +7774,7 @@ class Harpie(Monstre):
             effet_nefaste=random.randint(1,100)
             limite_reussite=Calcul.taux_reussite_effet(0.5,cible.resistance_actuelle,self.precision_actuelle)
             if(effet_nefaste<=100*limite_reussite):
-                cible.perturbation_recup(2)
+                cible.perturbation_recuperation(2)
 
     def danse_celeste(self,cible):
         print('\n',self.surnom,self.attribut,' entame une dance céleste et lacère plusieurs fois ',cible.surnom,cible.attribut,'!!\n')
@@ -8090,7 +8094,7 @@ class Salamandre(Monstre):
                 print(equipe_ennemie.membres[index].surnom,equipe_ennemie.membres[index].attribut,'reçoit le tremblement de terre!!')
                 degats=(Arrondir.a_l_unite(2.1*self.defense_actuelle))+self.calcul_dommages(2,self.capacite3_bonus_skill,equipe_ennemie.membres[index])
                 self.affichage_du_type_de_coup(2,self.capacite3_bonus_skill,degats-(Arrondir.a_l_unite(2.1*self.defense_actuelle)),equipe_ennemie.membres[index])
-                degats=self.reduction_dommages(equipe_ennemie.membres[index],degats)
+                degats=equipe_ennemie.membres[index].reduction_dommages(degats)
                 self.procedure_attaque(degats,equipe_ennemie.membres[index])
                 if(equipe_ennemie.membres[index].immunite==0):
                     effet_nefaste=random.randint(1,100)
@@ -8309,7 +8313,7 @@ class Esprit(Monstre):
         self.procedure_attaque(degats,cible)
         nb_allies=equipe_alliee.len
         if(nb_allies>0):
-            pv_min=equipe_alliee[0].pv_actuels
+            pv_min=equipe_alliee.membres[0].pv_actuels
             indice_allie_a_soigner=0
             i=0
             while(i<=nb_allies-1):
@@ -8317,8 +8321,8 @@ class Esprit(Monstre):
                     pv_min=equipe_alliee.membres[index].pv_actuels
                     indice_allie_a_soigner=i
                 i+=1
-            montant=Arrondir.a_l_unite(0.15*equipe_alliee[indice_allie_a_soigner].pv_max_donjons)
-            equipe_alliee[indice_allie_a_soigner].etre_soigne(montant)
+            montant=Arrondir.a_l_unite(0.15*equipe_alliee.membres[indice_allie_a_soigner].pv_max_donjons)
+            equipe_alliee.membres[indice_allie_a_soigner].etre_soigne(montant)
         ''' Verifier que la jauge d'attaque ne réaugmente pas immédiatement ex. de 15 '''
         ''' Askip non '''
 
@@ -8939,27 +8943,27 @@ class Chevalier(Monstre):
 
     def abnegation(self,equipe_ennemie):
         print('\n',self.surnom,self.attribut,' provoque toute l équipe ennemie!!\n')
-        for j in range(equipe_ennemie.len):
-            if(equipe_ennemie[j].pv_actuels>0):
+        for index in range(equipe_ennemie.len):
+            if(equipe_ennemie.membres[index].pv_actuels>0):
                 effet_nefaste=random.randint(1,100)
-                limite_reussite=Calcul.taux_reussite_effet(0.8,equipe_ennemie[j].resistance_actuelle,self.precision_actuelle)
+                limite_reussite=Calcul.taux_reussite_effet(0.8,equipe_ennemie.membres[index].resistance_actuelle,self.precision_actuelle)
                 if(effet_nefaste<=100*limite_reussite):
-                    print(equipe_ennemie[j].surnom,equipe_ennemie[j].attribut,'devient provoqué!!')
-                    equipe_ennemie[j].provoque=1
-                    equipe_ennemie[j].tours_provoque=max(2,equipe_ennemie[j].tours_provoque)
+                    print(equipe_ennemie.membres[index].surnom,equipe_ennemie.membres[index].attribut,'devient provoqué!!')
+                    equipe_ennemie.membres[index].provoque=1
+                    equipe_ennemie.membres[index].tours_provoque=max(2,equipe_ennemie.membres[index].tours_provoque)
                     self.provocation=1
                     self.tours_provocation=2
-        self.tanky(self,3)
+        self.tanky(3)
 
     def chevalerie(equipe_alliee):
-        for k in range(equipe_alliee.len):
-            equipe_alliee[k].reduction_de_degats+=0.2
-            print(equipe_alliee[k].surnom,equipe_alliee[k].attribut,' voit sa réduction de dégâts augmenter de 20%!!')
-            print('La réduction de dégâts de ',equipe_alliee[k].surnom,equipe_alliee[k].attribut,' est désormais de ',equipe_alliee[k].reduction_de_degats,'!!\n')
+        for index in range(equipe_alliee.len):
+            equipe_alliee.membres[index].reduction_de_degats+=0.2
+            print(equipe_alliee.membres[index].surnom,equipe_alliee.membres[index].attribut,' voit sa réduction de dégâts augmenter de 20%!!')
+            print('La réduction de dégâts de ',equipe_alliee.membres[index].surnom,equipe_alliee.membres[index].attribut,' est désormais de ',equipe_alliee.membres[index].reduction_de_degats,'!!\n')
 
     def anti_chevalerie(equipe_alliee):
-        for k in range(equipe_alliee.len):
-            equipe_alliee[k].reduction_de_degats-=0.2
+        for index in range(equipe_alliee.len):
+            equipe_alliee.membres[index].reduction_de_degats-=0.2
 
     def urgence(equipe_alliee):
         for index in range(equipe_alliee.len):
@@ -9270,18 +9274,18 @@ class Fee(Monstre):
     def double_fleche(self,equipe_ennemie):
         ''' ON PEUT CHOISIR POUR L ENNEMI !!! :( '''
         positions_ennemis=['de gauche','du centre','de droite']
-        k=0
-        while(k<equipe_ennemie.len):
-            if (equipe_ennemie[k].pv_actuels<=0):
-                equipe_ennemie.pop(k)
-                positions_ennemis.pop(k)
-                k-=1
-            k+=1
+        index=0
+        while(index < equipe_ennemie.len):
+            if (equipe_ennemie.membres[index].pv_actuels <= 0):
+                equipe_ennemie.pop(index)
+                positions_ennemis.pop(index)
+                index-=1
+            index+=1
         possibilites_cible=[]
         print('Vos ennemis sont : ')
-        for k in range(equipe_ennemie.len):
-            print(equipe_ennemie[k].surnom,equipe_ennemie[k].attribut,positions_ennemis[k],' = ',k,'(',equipe_ennemie[k].pv_actuels,'PV restants)')
-            possibilites_cible.append(k)
+        for index in range(equipe_ennemie.len):
+            print(equipe_ennemie.membres[index].surnom,equipe_ennemie.membres[index].attribut,positions_ennemis[index],' = ',index,'(',equipe_ennemie.membres[index].pv_actuels,'PV restants)')
+            possibilites_cible.append(index)
         entree=input('Quelle cible voulez-vous attaquer ? ')
         while(not Security.is_decimal(entree)):
             entree=input('Quelle cible voulez-vous attaquer ? ')
@@ -9291,19 +9295,19 @@ class Fee(Monstre):
             while(not Security.is_decimal(entree)):
                 entree=input('Quelle cible voulez-vous attaquer ? ')
             indice_cible=int(entree)
-        cible=equipe_ennemie[indice_cible]
+        cible=equipe_ennemie.membres[indice_cible]
         print('\n',self.surnom,self.attribut,' tire une première flèche magique sur ',cible.surnom,cible.attribut,'!! \n')
         degats=self.calcul_dommages(3.4,self.capacite2_bonus_skill,cible)
         self.affichage_du_type_de_coup(3.4,self.capacite2_bonus_skill,degats,cible)
         degats=cible.reduction_dommages(degats)
         self.procedure_attaque(degats,cible)
 
-        if Equipe.is_alive(equipe_ennemie):
+        if (equipe_ennemie.is_alive()):
             print('\n',self.surnom,self.attribut,' tire une deuxième flèche magique aléatoire sur l équipe ennemie!!\n')
             indice_cible_random=random.randint(0,equipe_ennemie.len-1)
-            while(equipe_ennemie[indice_cible_random].pv_actuels<=0):
+            while(equipe_ennemie.membres[indice_cible_random].pv_actuels<=0):
                 indice_cible_random=random.randint(0,equipe_ennemie.len-1)
-            cible_2=equipe_ennemie[indice_cible_random]
+            cible_2=equipe_ennemie.membres[indice_cible_random]
             degats=self.calcul_dommages(3.4,self.capacite2_bonus_skill,cible_2)
             self.affichage_du_type_de_coup(3.4,self.capacite2_bonus_skill,degats,cible_2)
             degats=self.reduction_dommages(cible_2,degats)
@@ -9317,11 +9321,11 @@ class Fee(Monstre):
         nb_attaques=random.randint(4,6)
         print('\n',self.surnom,self.attribut,' attaque toute l\'équipe ennemie avec une pluie de flèches magiques aléatoires!!\n')
         for index in range(nb_attaques):
-            if(Equipe.is_alive(equipe_ennemie)):
+            if(equipe_ennemie.is_alive()):
                 indice_cible=random.randint(0,equipe_ennemie.len-1)
-                while(equipe_ennemie[indice_cible].pv_actuels<=0):
+                while(equipe_ennemie.membres[indice_cible].pv_actuels<=0):
                     indice_cible=random.randint(0,equipe_ennemie.len-1)
-                cible=equipe_ennemie[indice_cible]
+                cible=equipe_ennemie.membres[indice_cible]
                 degats=self.calcul_dommages(0.85*equipe_ennemie.len,self.capacite3_bonus_skill,cible)
                 self.affichage_du_type_de_coup(0.85,self.capacite3_bonus_skill,0.85*equipe_ennemie.len,cible)
                 degats=cible.reduction_dommages(degats)
@@ -9644,15 +9648,15 @@ class DameHarpie(Monstre):
     def plumes(self,equipe_ennemie):
         print('\n',self.surnom,self.attribut,' attaque toute l\'équipe ennemie avec une pluie de plumes tranchantes aléatoires!!\n')
         nb_ennemis_vivants=0
-        for j in range(equipe_ennemie.len):
-            if(equipe_ennemie[j].pv_actuels>0):
+        for index in range(equipe_ennemie.len):
+            if(equipe_ennemie.membres[index].pv_actuels>0):
                 nb_ennemis_vivants+=1
         for index in range(equipe_ennemie.len):
-            if(Equipe.is_alive(equipe_ennemie)):
+            if(equipe_ennemie.is_alive()):
                 indice_cible=random.randint(0,equipe_ennemie.len-1)
-                while(equipe_ennemie[indice_cible].pv_actuels<=0):
+                while(equipe_ennemie.membres[indice_cible].pv_actuels<=0):
                     indice_cible=random.randint(0,equipe_ennemie.len-1)
-                cible=equipe_ennemie[indice_cible]
+                cible=equipe_ennemie.membres[indice_cible]
                 ''' Peut monter jusqu'à 7.8 dans les donjons OMG '''
                 degats=self.calcul_dommages(2.6*nb_ennemis_vivants,self.capacite2_bonus_skill,cible)
                 self.affichage_du_type_de_coup(2.6*nb_ennemis_vivants,self.capacite2_bonus_skill,degats,cible)
@@ -9663,7 +9667,7 @@ class DameHarpie(Monstre):
         for index in range(equipe_alliee.len):
             equipe_alliee.membres[index].jauge_attaque+=max(30,Arrondir.a_l_unite(0.3*equipe_alliee.membres[index].jauge_attaque))
             print('\n',equipe_alliee.membres[index].surnom,equipe_alliee.membres[index].attribut,'voit sa jauge d\'attaque augmenter de 30!!')
-            self.espada(equipe_alliee.membres[index],3)
+            equipe_alliee.membres[index].espada(3)
 
     def laceration(self,cible):
         print('\n',self.surnom,self.attribut,' fend les cieux pour lacérer mortellement ',cible.surnom,cible.attribut,'!!\n')
@@ -10002,7 +10006,7 @@ class Inugami(Monstre):
         if (degats<=0):
             degats=1
         if(cible.immortalite<=0):
-            self.recoitDegats(cible,degats)
+            cible.recoit_degats(degats)
             print(cible.surnom,cible.attribut,' reçoit ',degats,' points de dégâts!! \n')
             if (self.perturbation_recup<=0):
                 self.etre_soigne(math.floor(self.vol_de_vie*degats/100))
@@ -10014,7 +10018,7 @@ class Inugami(Monstre):
             print(cible.surnom,cible.attribut,' est mort!! \n')
         else:
             print('Il reste ',cible.pv_actuels,' point(s) de vie sur',cible.pv_max_donjons,' à ',cible.surnom,cible.attribut,'!! \n')
-        self.soigner_de_tous_les_biens(cible)
+        cible.soigner_de_tous_les_biens()
         print(cible.surnom,cible.attribut,' perd tous les bonus qu\'il avait!! \n')
 
     def coop(self,equipe_alliee,cible):
@@ -10025,12 +10029,12 @@ class Inugami(Monstre):
         if(len(possibilites_coop)>0):
             indice_random=random.randint(0,len(possibilites_coop)-1)
             indice=possibilites_coop[indice_random]
-            allie=equipe_alliee[indice]
+            allie=equipe_alliee.membres[indice]
             print('\n',self.surnom,self.attribut,' et ',allie.surnom,allie.attribut,' lancent une attaque combinée sur ',cible.surnom,cible.attribut,'!!\n')
             degats=self.calcul_dommages(3.7,self.capacite2_bonus_skill,cible)
             self.affichage_du_type_de_coup(3.7,self.capacite2_bonus_skill,degats,cible)
-            degats2=self.calcul_dommages(allie,3.7,allie.capacite1_bonus_skill,cible)
-            self.affichage_su_type_de_coup(allie,3.7,allie.capacite1_bonus_skill,degats2,cible)
+            degats2=allie.calcul_dommages(3.7,allie.capacite1_bonus_skill,cible)
+            allie.affichage_du_type_de_coup(3.7,allie.capacite1_bonus_skill,degats2,cible)
             degats+=degats2
             degats=cible.reduction_dommages(degats)
             if (degats<=0):
@@ -10057,19 +10061,19 @@ class Inugami(Monstre):
                     montant=Arrondir.a_l_unite(0.3*equipe_alliee.membres[index].pv_max_donjons)
                     equipe_alliee.membres[index].etre_soigne(montant)
                 equipe_alliee.membres[index].jauge_attaque+=max(30,Arrondir.a_l_unite(0.3*equipe_alliee.membres[index].jauge_attaque))
-                print(equipe_alliee.membres[index].surnom,equipe_alliee.membres[index].attribut,'voit sa jauge d\'attaque augmenter de 30!!')
+                print(equipe_alliee.membres[index].surnom,equipe_alliee.membres[index].attribut,'voit sa jauge d\'attaque augmenter de 30%!!')
 
     def laceration(self,cible):
         print('\n',self.surnom,self.attribut,' lacère profondément ',cible.surnom,cible.attribut,' en rouvrant ses cicatrices!!\n')
         degats=self.calcul_dommages(5.7,self.capacite3_bonus_skill,cible)
         self.affichage_du_type_de_coup(5.7,self.capacite3_bonus_skill,degats,cible)
-        for k in range(self.nb_effets_nocif(cible)):
+        for index in range(cible.nb_effets_nocif()):
             degats+=Arrondir.a_l_unite(0.5*degats)
         degats=cible.reduction_dommages(degats)
         if (degats<=0):
             degats=1
         if(cible.immortalite<=0):
-            self.recoitDegats(cible,degats)
+            cible.recoit_degats(degats)
             print(cible.surnom,cible.attribut,' reçoit ',degats,' points de dégâts!! \n')
             if (self.perturbation_recup<=0):
                 self.etre_soigne(math.floor(self.vol_de_vie*degats/100))
@@ -10388,11 +10392,11 @@ class Golem(Monstre):
             if (equipe_ennemie.membres[index].pv_actuels>0):
                 degats=(Arrondir.a_l_unite(2.5*self.defense_actuelle))+self.calcul_dommages(1.8,self.capacite2_bonus_skill,equipe_ennemie.membres[index])
                 self.affichage_du_type_de_coup(1.8,self.capacite2_bonus_skill,degats-(Arrondir.a_l_unite(2.5*self.defense_actuelle)),equipe_ennemie.membres[index])
-                degats=self.reduction_dommages(equipe_ennemie.membres[index],degats)
+                degats=equipe_ennemie.membres[index].reduction_dommages(degats)
                 self.procedure_attaque(degats,equipe_ennemie.membres[index])
                 if(equipe_ennemie.membres[index].immunite==0):
                     ''' CHECK SI LA PROBA EST DE 100 % OU DE 50 %, MEME SI 100 % FAIRE PREC ET RES '''
-                    self.degats_continus(equipe_ennemie.membres[index],1,3)
+                    equipe_ennemie.membres[index].degats_continus(1,3)
 
     def corps_de_glace(self,equipe_ennemie):
         print('\n',self.surnom,self.attribut,' écrase toute l\'équipe ennemie avec son corps de glace!!\n')
@@ -10400,7 +10404,7 @@ class Golem(Monstre):
             if (equipe_ennemie.membres[index].pv_actuels>0):
                 degats=(Arrondir.a_l_unite(2.5*self.defense_actuelle))+self.calcul_dommages(2.5,self.capacite2_bonus_skill,equipe_ennemie.membres[index])
                 self.affichage_du_type_de_coup(2.5,self.capacite2_bonus_skill,degats-(Arrondir.a_l_unite(2.5*self.defense_actuelle)),equipe_ennemie.membres[index])
-                degats=self.reduction_dommages(equipe_ennemie.membres[index],degats)
+                degats=equipe_ennemie.membres[index].reduction_dommages(degats)
                 self.procedure_attaque(degats,equipe_ennemie.membres[index])
                 if(equipe_ennemie.membres[index].immunite==0):
                     effet_nefaste=random.randint(1,100)
@@ -10411,8 +10415,8 @@ class Golem(Monstre):
 
     def mur_de_fer(self):
         print('\n',self.surnom,self.attribut,' se transforme en mur de fer!!\n')
-        self.tanky(self,3)
-        self.immunity(self,3)
+        self.tanky(3)
+        self.immunity(3)
         print('Sa jauge d\'attaque augmente à nouveau immédiatement!! \n')
         self.jauge_attaque+=max(50,Arrondir.a_l_unite(0.5*self.jauge_attaque))
 
@@ -10726,15 +10730,15 @@ class Mastodonte(Monstre):
     def pluie_de_gravats(self,equipe_ennemie):
         print('\n',self.surnom,self.attribut,' déclenche une pluie de gravats!!\n')
         nb_ennemis_vivants=0
-        for j in range(equipe_ennemie.len):
-            if(equipe_ennemie[j].pv_actuels>0):
+        for index in range(equipe_ennemie.len):
+            if(equipe_ennemie.membres[index].pv_actuels>0):
                 nb_ennemis_vivants+=1
         for index in range(equipe_ennemie.len):
             if (equipe_ennemie.membres[index].pv_actuels>0):
                 print(equipe_ennemie.membres[index].surnom,equipe_ennemie.membres[index].attribut,' reçoit la pluie de gravats!!')
                 degats=self.calcul_dommages(2.4*nb_ennemis_vivants,self.capacite2_bonus_skill,equipe_ennemie.membres[index])
                 self.affichage_du_type_de_coup(2.4*nb_ennemis_vivants,self.capacite2_bonus_skill,degats,equipe_ennemie.membres[index])
-                degats=self.reduction_dommages(equipe_ennemie.membres[index],degats)
+                degats=equipe_ennemie.membres[index].reduction_dommages(degats)
                 self.procedure_attaque(degats,equipe_ennemie.membres[index])
 
     def charge(self,cible):
@@ -10752,8 +10756,8 @@ class Mastodonte(Monstre):
 
     def armure_de_glace(self):
         print('\n',self.surnom,self.attribut,' se renforce d\'une armure de glace!!\n')
-        self.tanky(self,3)
-        self.immunity(self,3)
+        self.tanky(3)
+        self.immunity(3)
         print('Il renverra une partie des dégâts subis pour trois tours!! \n')
         self.reflexion_dommages=1
         self.pourcentage_reflexion_dommages+=0.15
@@ -11030,7 +11034,7 @@ class Serpent(Monstre):
             effet_nefaste=random.randint(1,100)
             limite_reussite=Calcul.taux_reussite_effet(0.75,cible.resistance_actuelle,self.precision_actuelle)
             if(effet_nefaste<=100*limite_reussite):
-                self.retirer_un_bonus(cible)
+                cible.retirer_un_bonus()
 
     def deflagration(self,cible):
         print('\n',self.surnom,self.attribut,' pulvérise ',cible.surnom,cible.attribut,' d\'une puissante déflagration!!\n')
@@ -11053,7 +11057,7 @@ class Serpent(Monstre):
             if (equipe_ennemie.membres[index].pv_actuels>0):
                 print(equipe_ennemie.membres[index].surnom,equipe_ennemie.membres[index].attribut,' reçoit le tsunami!!')
                 degats=Arrondir.a_l_unite(0.28*self.pv_max_donjons)
-                degats=self.reduction_dommages(equipe_ennemie.membres[index],degats)
+                degats=equipe_ennemie.membres[index].reduction_dommages(degats)
                 self.procedure_attaque(degats,equipe_ennemie.membres[index])
                 if(equipe_ennemie.membres[index].immunite==0):
                     print(equipe_ennemie.membres[index].surnom,equipe_ennemie.membres[index].attribut,' voit sa jauge d\'attaque diminuer de 30%!!\n')
@@ -11067,7 +11071,7 @@ class Serpent(Monstre):
                 degats=self.calcul_dommages(1,self.capacite2_bonus_skill,equipe_ennemie.membres[index])
                 self.affichage_du_type_de_coup(1,self.capacite2_bonus_skill,degats,equipe_ennemie.membres[index])
                 degats+=Arrondir.a_l_unite(0.16*self.pv_max_donjons)
-                degats=self.reduction_dommages(equipe_ennemie.membres[index],degats)
+                degats=equipe_ennemie.membres[index].reduction_dommages(degats)
                 self.procedure_attaque(degats,equipe_ennemie.membres[index])
                 if(equipe_ennemie.membres[index].immunite==0):
                     effet_nefaste=random.randint(1,100)
@@ -11743,7 +11747,7 @@ class Inferno(Monstre):
                 print(equipe_ennemie.membres[index].surnom,equipe_ennemie.membres[index].attribut,' reçoit la déflagration!!')
                 degats=self.calcul_dommages(2.7,self.capacite2_bonus_skill,equipe_ennemie.membres[index])
                 self.affichage_du_type_de_coup(2.7,self.capacite2_bonus_skill,degats,equipe_ennemie.membres[index])
-                degats=self.reduction_dommages(equipe_ennemie.membres[index],degats)
+                degats=equipe_ennemie.membres[index].reduction_dommages(degats)
                 self.procedure_attaque(degats,equipe_ennemie.membres[index])
                 if(equipe_ennemie.membres[index].immunite==0):
                     effet_nefaste=random.randint(1,100)
@@ -11758,13 +11762,13 @@ class Inferno(Monstre):
                 print(equipe_ennemie.membres[index].surnom,equipe_ennemie.membres[index].attribut,' reçoit la foudre!!')
                 degats=self.calcul_dommages(2.7,self.capacite2_bonus_skill,equipe_ennemie.membres[index])
                 self.affichage_du_type_de_coup(2.7,self.capacite2_bonus_skill,degats,equipe_ennemie.membres[index])
-                degats=self.reduction_dommages(equipe_ennemie.membres[index],degats)
+                degats=equipe_ennemie.membres[index].reduction_dommages(degats)
                 self.procedure_attaque(degats,equipe_ennemie.membres[index])
                 if(equipe_ennemie.membres[index].immunite==0):
                     effet_nefaste=random.randint(1,100)
                     limite_reussite=Calcul.taux_reussite_effet(0.8,equipe_ennemie.membres[index].resistance_actuelle,self.precision_actuelle)
                     if(effet_nefaste<=100*limite_reussite):
-                        self.atk_break(equipe_ennemie.membres[index],2)
+                        equipe_ennemie.membres[index].atk_break(2)
 
     def jugement_divin(self,cible):
         print('\n',self.surnom,self.attribut,' fait s\'abattre le jugement divin sur ',cible.surnom,cible.attribut,'!!\n')
@@ -11772,7 +11776,7 @@ class Inferno(Monstre):
         self.affichage_du_type_de_coup(7.7,self.capacite3_bonus_skill,degats,cible)
         degats=cible.reduction_dommages(degats)
         self.procedure_attaque(degats,cible)
-        self.soigner_de_tous_les_biens(cible)
+        cible.soigner_de_tous_les_biens()
 
     def coup_mortel(self,cible):
         print('\n',self.surnom,self.attribut,' pulvérise ',cible.surnom,cible.attribut,' d\'un coup mortel!!\n')
@@ -11788,7 +11792,7 @@ class Inferno(Monstre):
         for index in range(equipe_alliee.len):
             equipe_alliee.membres[index].jauge_attaque+=max(50,Arrondir.a_l_unite(0.5*equipe_alliee.membres[index].jauge_attaque))
             print(equipe_alliee.membres[index].surnom,equipe_alliee.membres[index].attribut,' voit sa jauge d\'attaque augmenter de moitié!!')
-            self.espada(equipe_alliee.membres[index],3)
+            equipe_alliee.membres[index].espada(3)
 
     def critique_enflammee(equipe_alliee):
         for index in range(equipe_alliee.len):
@@ -12109,7 +12113,7 @@ class HautElementaire(Monstre):
             effet_nefaste=random.randint(1,100)
             limite_reussite=Calcul.taux_reussite_effet(1,cible.resistance_actuelle,self.precision_actuelle)
             if(effet_nefaste<=100*limite_reussite):
-                cible.perturbation_recup(2)
+                cible.perturbation_recuperation(2)
         if(cible.pv_actuels<=0 and self.perturbation_recup<=0):
             print(self.surnom,self.attribut,' dévore l\'Âme de ',cible.surnom,cible.attribut,'!! \n')
             ''' Le montant est 35% des PV max de la cible ou du HE ? '''
@@ -12460,9 +12464,9 @@ class OursDeCombat(Monstre):
         print('\nUn Cri de Renforcement retentit!! Toute l\'équipe voit ses forces augmenter!!\n')
         for index in range(equipe_alliee.len):
             if(equipe_alliee.membres[index].pv_actuels>0):
-                self.retirer_un_malus(equipe_alliee.membres[index])
-                self.retirer_un_malus(equipe_alliee.membres[index])
-                self.rise(equipe_alliee.membres[index],2)
+                equipe_alliee.membres[index].retirer_un_malus()
+                equipe_alliee.membres[index].retirer_un_malus()
+                equipe_alliee.membres[index].rise(2)
 
     def bouclier_enflamme(equipe_alliee):
         for index in range(equipe_alliee.len):
@@ -12796,7 +12800,7 @@ class LoupGarou(Monstre):
             effet_nefaste=random.randint(1,100)
             limite_reussite=Calcul.taux_reussite_effet(1,cible.resistance_actuelle,self.precision_actuelle)
             if(effet_nefaste<=100*limite_reussite):
-                cible.perturbation_recup(1)
+                cible.perturbation_recuperation(1)
         if(self.attribut=='Ténèbres'):
             cible.def_break(1)
 
@@ -12851,7 +12855,7 @@ class LoupGarou(Monstre):
                 effet_nefaste=random.randint(1,100)
                 limite_reussite=Calcul.taux_reussite_effet(0.35,cible.resistance_actuelle,self.precision_actuelle)
                 if(effet_nefaste<=100*limite_reussite):
-                    self.retirer_un_bonus(cible)
+                    cible.retirer_un_bonus()
             if(self.attribut=='Ténèbres'):
                 cible.def_break(1)
             if(cible.pv_actuels<=0):
@@ -12876,7 +12880,7 @@ class LoupGarou(Monstre):
             degats=Arrondir.a_l_unite(0.12*self.pv_max_donjons)
             degats=self.reduction_dommages(degats)
             if(cible.immortalite<=0):
-                self.recoitDegats(cible,degats)
+                cible.recoit_degats(degats)
                 print(cible.surnom,cible.attribut,' reçoit ',degats,' points de dégâts!! \n')
             else:
                 print(cible.surnom,cible.attribut,'ne subit pas de dégâts grâce à son état d Immortalité!!')
@@ -13157,11 +13161,11 @@ class Elfe(Monstre):
     def fleches(self,equipe_ennemie):
         print('\n',self.surnom,self.attribut,' attaque toute l\'équipe ennemie avec une pluie de flèches célestes aléatoires!!\n')
         for index in range(equipe_ennemie.len):
-            if(Equipe.is_alive(equipe_ennemie)):
+            if(equipe_ennemie.is_alive()):
                 indice_cible=random.randint(0,equipe_ennemie.len-1)
-                while(equipe_ennemie[indice_cible].pv_actuels<=0):
+                while(equipe_ennemie.membres[indice_cible].pv_actuels<=0):
                     indice_cible=random.randint(0,equipe_ennemie.len-1)
-                cible=equipe_ennemie[indice_cible]
+                cible=equipe_ennemie.membres[indice_cible]
                 degats=self.calcul_dommages(2,self.capacite2_bonus_skill,cible)
                 self.affichage_du_type_de_coup(2,self.capacite2_bonus_skill,degats,cible)
                 degats=cible.reduction_dommages(degats)
@@ -13175,10 +13179,10 @@ class Elfe(Monstre):
     def pluie(self,equipe_ennemie):
         print('\n',self.surnom,self.attribut,' attaque toute l\'équipe ennemie avec une pluie de flèches!!\n')
         for index in range(equipe_ennemie.len):
-            if(Equipe.is_alive(equipe_ennemie)):
+            if(equipe_ennemie.is_alive()):
                 degats=self.calcul_dommages(4.8,self.capacite3_bonus_skill,equipe_ennemie.membres[index])
                 self.affichage_du_type_de_coup(4.8,self.capacite3_bonus_skill,degats,equipe_ennemie.membres[index])
-                degats=self.reduction_dommages(equipe_ennemie.membres[index],degats)
+                degats=equipe_ennemie.membres[index].reduction_dommages(degats)
                 self.procedure_attaque(degats,equipe_ennemie.membres[index])
                 if(equipe_ennemie.membres[index].stun==0 and equipe_ennemie.membres[index].gel==0 and equipe_ennemie.membres[index].sommeil==0):
                     print(equipe_ennemie.membres[index].surnom,equipe_ennemie.membres[index].attribut,' voit sa jauge d\'attaque diminuer de moitié!! \n')
@@ -13215,7 +13219,7 @@ class Elfe(Monstre):
         print('\nL\'équipe échafaude un plan machiavélique en s\'inspirant du FûRinKaZan...\n')
         for index in range(equipe_alliee.len):
             self.speed_up(equipe_alliee.membres[index],3)
-            self.espada(equipe_alliee.membres[index],3)
+            equipe_alliee.membres[index].espada(3)
 
     def mouvement_esquive(equipe_alliee):
         for index in range(equipe_alliee.len):
@@ -13241,7 +13245,7 @@ class Elfe(Monstre):
                 degats=Arrondir.a_l_unite(0.65*self.attaque_actuelle)
                 degats=cible.reduction_dommages(degats)
                 if(cible.immortalite<=0):
-                    self.recoitDegats(cible,degats)
+                    cible.recoit_degats(degats)
                     print(cible.surnom,cible.attribut,' reçoit ',degats,' points de dégâts!! \n')
                 else:
                     print(cible.surnom,cible.attribut,'ne subit pas de dégâts grâce à son état d Immortalité!!')
@@ -13515,7 +13519,7 @@ class Sylphe(Monstre): # Arashi
         degats=cible.reduction_dommages(degats)
         self.procedure_attaque(degats,cible)
         if(type_coup=='Critique'):
-            self.espada(self,1)
+            self.espada(1)
 
     def turbulences(self,cible):
         print('\n',self.surnom,self.attribut,' cause de violentes turbulences autour de ',cible.surnom,cible.attribut,'!!\n')
@@ -13540,52 +13544,52 @@ class Sylphe(Monstre): # Arashi
     def tourbillon(self,equipe_ennemie):
         print('\n',self.surnom,self.attribut,' balaye deux fois l\'équipe ennemie avec un tourbillon élémentaire!!\n')
         for index in range(2):
-            for j in range(equipe_ennemie.len):
-                if(Equipe.is_alive(equipe_ennemie) and equipe_ennemie[j].pv_actuels>0):
-                    degats=self.calcul_dommages(1.3,self.capacite2_bonus_skill,equipe_ennemie[j])
-                    self.affichage_du_type_de_coup(1.3,self.capacite2_bonus_skill,degats,equipe_ennemie[j])
-                    degats+=Arrondir.a_l_unite(0.04*equipe_ennemie[j].pv_max_donjons)
-                    degats=self.reduction_dommages(equipe_ennemie[j],degats)
-                    self.procedure_attaque(degats,equipe_ennemie[j])
-                    if(equipe_ennemie[j].immunite==0):
+            for index_bis in range(equipe_ennemie.len):
+                if(equipe_ennemie.is_alive() and equipe_ennemie.membres[index_bis].pv_actuels>0):
+                    degats=self.calcul_dommages(1.3,self.capacite2_bonus_skill,equipe_ennemie.membres[index_bis])
+                    self.affichage_du_type_de_coup(1.3,self.capacite2_bonus_skill,degats,equipe_ennemie.membres[index_bis])
+                    degats+=Arrondir.a_l_unite(0.04*equipe_ennemie.membres[index_bis].pv_max_donjons)
+                    degats=equipe_ennemie.membres[index_bis].reduction_dommages(degats)
+                    self.procedure_attaque(degats,equipe_ennemie.membres[index_bis])
+                    if(equipe_ennemie.membres[index_bis].immunite==0):
                         effet_nefaste=random.randint(1,100)
-                        limite_reussite=Calcul.taux_reussite_effet(0.4,equipe_ennemie[j].resistance_actuelle,self.precision_actuelle)
+                        limite_reussite=Calcul.taux_reussite_effet(0.4,equipe_ennemie.membres[index_bis].resistance_actuelle,self.precision_actuelle)
                         if(effet_nefaste<=100*limite_reussite):
-                            self.bonus_coup_superficiel(equipe_ennemie[j],2)
+                            equipe_ennemie.membres[index_bis].bonus_coup_superficiel(2)
             print('\n\n')
 
     def nuit(self,equipe_ennemie):
         print('\n',self.surnom,self.attribut,' enveloppe toute l\'équipe ennemie dans une brume noire mystérieuse... La nuit tombe!!\n')
         for index in range(equipe_ennemie.len):
-            if(Equipe.is_alive(equipe_ennemie) and equipe_ennemie.membres[index].pv_actuels>0):
-                self.sommeil(equipe_ennemie.membres[index],2)
+            if(equipe_ennemie.is_alive() and equipe_ennemie.membres[index].pv_actuels>0):
+                equipe_ennemie.membres[index].sommeil(2)
 
     def cyclone(self,equipe_ennemie):
         print('\n',self.surnom,self.attribut,' balaye quatre fois l\'équipe ennemie avec un puissant cyclone!!\n')
         for index in range(4):
-            for j in range(equipe_ennemie.len):
-                if(Equipe.is_alive(equipe_ennemie) and equipe_ennemie[j].pv_actuels>0):
-                    degats=self.calcul_dommages(1.1,self.capacite3_bonus_skill,equipe_ennemie[j])
-                    self.affichage_du_type_de_coup(1.1,self.capacite3_bonus_skill,degats,equipe_ennemie[j])
-                    degats=self.reduction_dommages(equipe_ennemie[j],degats)
-                    self.procedure_attaque(degats,equipe_ennemie[j])
-                    if(equipe_ennemie[j].immunite==0):
+            for index_bis in range(equipe_ennemie.len):
+                if(equipe_ennemie.is_alive() and equipe_ennemie.membres[index_bis].pv_actuels>0):
+                    degats=self.calcul_dommages(1.1,self.capacite3_bonus_skill,equipe_ennemie.membres[index_bis])
+                    self.affichage_du_type_de_coup(1.1,self.capacite3_bonus_skill,degats,equipe_ennemie.membres[index_bis])
+                    degats=equipe_ennemie.membres[index_bis].reduction_dommages(degats)
+                    self.procedure_attaque(degats,equipe_ennemie.membres[index_bis])
+                    if(equipe_ennemie.membres[index_bis].immunite==0):
                         effet_nefaste=random.randint(1,100)
-                        limite_reussite=Calcul.taux_reussite_effet(0.2,equipe_ennemie[j].resistance_actuelle,self.precision_actuelle)
+                        limite_reussite=Calcul.taux_reussite_effet(0.2,equipe_ennemie.membres[index_bis].resistance_actuelle,self.precision_actuelle)
                         if(effet_nefaste<=100*limite_reussite):
-                            print(equipe_ennemie[j].surnom,equipe_ennemie[j].attribut,' est étourdi(e)!!')
-                            print(self.surnom,self.attribut,' voit sa jauge d\'attaque augmenter d\'un cinquième de la jauge de ',equipe_ennemie[j].surnom,equipe_ennemie[j].attribut,'!!\n')
-                            equipe_ennemie[j].stun=1
-                            self.jauge_attaque+=Arrondir.a_l_unite(0.2*equipe_ennemie[j].jauge_attaque)
+                            print(equipe_ennemie.membres[index_bis].surnom,equipe_ennemie.membres[index_bis].attribut,' est étourdi(e)!!')
+                            print(self.surnom,self.attribut,' voit sa jauge d\'attaque augmenter d\'un cinquième de la jauge de ',equipe_ennemie.membres[index_bis].surnom,equipe_ennemie.membres[index_bis].attribut,'!!\n')
+                            equipe_ennemie.membres[index_bis].stun=1
+                            self.jauge_attaque+=Arrondir.a_l_unite(0.2*equipe_ennemie.membres[index_bis].jauge_attaque)
             print('\n\n')
 
     def blizzard(self,equipe_ennemie):
         print('\n',self.surnom,self.attribut,' engloutit toute l\'équipe ennemie dans un puissant blizzard!!\n')
         for index in range(equipe_ennemie.len):
-            if(Equipe.is_alive(equipe_ennemie) and equipe_ennemie.membres[index].pv_actuels>0):
+            if(equipe_ennemie.is_alive() and equipe_ennemie.membres[index].pv_actuels>0):
                 degats=self.calcul_dommages(3,self.capacite3_bonus_skill,equipe_ennemie.membres[index])
                 self.affichage_du_type_de_coup(3,self.capacite3_bonus_skill,degats,equipe_ennemie.membres[index])
-                degats=self.reduction_dommages(equipe_ennemie.membres[index],degats)
+                degats=equipe_ennemie.membres[index].reduction_dommages(degats)
                 self.procedure_attaque(degats,equipe_ennemie.membres[index])
                 if(equipe_ennemie.membres[index].immunite==0):
                     effet_nefaste=random.randint(1,100)
@@ -13598,16 +13602,16 @@ class Sylphe(Monstre): # Arashi
     def phenix(self,equipe_ennemie):
         print('\n',self.surnom,self.attribut,' invoque un Phénix incandescent!! Celui-ci engloutit toute l\'équipe ennemie dans une tempête de flammes!!\n')
         for index in range(equipe_ennemie.len):
-            if(Equipe.is_alive(equipe_ennemie) and equipe_ennemie.membres[index].pv_actuels>0):
+            if(equipe_ennemie.is_alive() and equipe_ennemie.membres[index].pv_actuels>0):
                 degats=self.calcul_dommages(4,self.capacite3_bonus_skill,equipe_ennemie.membres[index])
                 self.affichage_du_type_de_coup(4,self.capacite3_bonus_skill,degats,equipe_ennemie.membres[index])
-                degats=self.reduction_dommages(equipe_ennemie.membres[index],degats)
+                degats=equipe_ennemie.membres[index].reduction_dommages(degats)
                 self.procedure_attaque(degats,equipe_ennemie.membres[index])
                 if(equipe_ennemie.membres[index].immunite==0):
                     effet_nefaste=random.randint(1,100)
                     limite_reussite=Calcul.taux_reussite_effet(1,equipe_ennemie.membres[index].resistance_actuelle,self.precision_actuelle)
                     if(effet_nefaste<=100*limite_reussite):
-                        self.degats_continus(equipe_ennemie.membres[index],1,3)
+                        equipe_ennemie.membres[index].degats_continus(1,3)
 
     def vitesse(equipe_alliee):
         for index in range(equipe_alliee.len):
@@ -13827,7 +13831,7 @@ class Sylphide(Monstre): # Hayate
             self.capacite1=Sylphide.lame
             self.capacite1_nom='Lame Elémentaire'
             self.capacite1_bonus_skill=0
-            self.tempsrecharge1=1
+            self.temps_recharge1=1
             self.attente1=0
             self.etat_cap1='dispo'
 
@@ -13930,12 +13934,12 @@ class Sylphide(Monstre): # Hayate
 
     def bourrasque(self,equipe_ennemie,equipe_alliee):
         print('\n',self.surnom,self.attribut,' balaye toute l\'équipe ennemie avec une bourrasque spirituelle!!\n')
-        for j in range(equipe_ennemie.len):
-            if(Equipe.is_alive(equipe_ennemie) and equipe_ennemie[j].pv_actuels>0):
-                degats=self.calcul_dommages(2.6,self.capacite2_bonus_skill,equipe_ennemie[j])
-                self.affichage_du_type_de_coup(2.6,self.capacite2_bonus_skill,degats,equipe_ennemie[j])
-                degats=self.reduction_dommages(degats,equipe_ennemie[j])
-                self.procedure_attaque(degats,equipe_ennemie[j])
+        for index in range(equipe_ennemie.len):
+            if(equipe_ennemie.is_alive() and equipe_ennemie.membres[index].pv_actuels>0):
+                degats=self.calcul_dommages(2.6,self.capacite2_bonus_skill,equipe_ennemie.membres[index])
+                self.affichage_du_type_de_coup(2.6,self.capacite2_bonus_skill,degats,equipe_ennemie.membres[index])
+                degats=self.reduction_dommages(degats,equipe_ennemie.membres[index])
+                self.procedure_attaque(degats,equipe_ennemie.membres[index])
         print('\n')
         for index in range(equipe_alliee.len):
             if(equipe_alliee.membres[index].pv_actuels>0):
@@ -13944,12 +13948,12 @@ class Sylphide(Monstre): # Hayate
 
     def bourrasque2(self,equipe_ennemie,equipe_alliee):
         print('\n',self.surnom,self.attribut,' balaye toute l\'équipe ennemie avec une bourrasque spirituelle!!\n')
-        for j in range(equipe_ennemie.len):
-            if(Equipe.is_alive(equipe_ennemie) and equipe_ennemie[j].pv_actuels>0):
-                degats=self.calcul_dommages(2.6,self.capacite2_bonus_skill,equipe_ennemie[j])
-                self.affichage_du_type_de_coup(2.6,self.capacite2_bonus_skill,degats,equipe_ennemie[j])
-                degats=self.reduction_dommages(equipe_ennemie[j],degats)
-                self.procedure_attaque(degats,equipe_ennemie[j])
+        for index in range(equipe_ennemie.len):
+            if(equipe_ennemie.is_alive() and equipe_ennemie.membres[index].pv_actuels>0):
+                degats=self.calcul_dommages(2.6,self.capacite2_bonus_skill,equipe_ennemie.membres[index])
+                self.affichage_du_type_de_coup(2.6,self.capacite2_bonus_skill,degats,equipe_ennemie.membres[index])
+                degats=equipe_ennemie.membres[index].reduction_dommages(degats)
+                self.procedure_attaque(degats,equipe_ennemie.membres[index])
         print('\n')
         for index in range(equipe_alliee.len):
             if(equipe_alliee.membres[index].pv_actuels>0):
@@ -13979,9 +13983,9 @@ class Sylphide(Monstre): # Hayate
 
     def bouclier(equipe_alliee):
         print('\nSylphide Vent protège toute l\'équipe d\'un bouclier d\'énergie spirituelle!!\n')
-        for j in range(equipe_alliee.len):
-            if(equipe_alliee[j].nom=='Sylphide' and equipe_alliee[j].attribut=='Vent'):
-                montant=equipe_alliee[j].niveau*100
+        for index in range(equipe_alliee.len):
+            if(equipe_alliee.membres[index].nom=='Sylphide' and equipe_alliee.membres[index].attribut=='Vent'):
+                montant=equipe_alliee.membres[index].niveau*100
         for index in range(equipe_alliee.len):
             if(equipe_alliee.membres[index].pv_actuels>0):
                 print(equipe_alliee.membres[index].surnom,equipe_alliee.membres[index].attribut,' reçoit un bouclier d\'un montant égal à ',montant,'!!')
@@ -14343,12 +14347,12 @@ class ChevalierMagique(Monstre):
             self.procedure_attaque(degats,cible)
         print('\nLa troisième attaque touche toute l\'équipe ennemie!!\n')
         for index in range(equipe_ennemie.len):
-            if(Equipe.is_alive(equipe_ennemie)):
+            if(equipe_ennemie.is_alive()):
                 degats=self.calcul_dommages(2,self.capacite1_bonus_skill,equipe_ennemie.membres[index])
                 self.affichage_du_type_de_coup(2,self.capacite1_bonus_skill,degats,equipe_ennemie.membres[index])
                 if(self.attribut=='Feu' and equipe_ennemie.membres[index].pv_actuels>self.pv_actuels):
                     degats+=Arrondir.a_l_unite(0.5*degats)
-                degats=self.reduction_dommages(equipe_ennemie.membres[index],degats)
+                degats=equipe_ennemie.membres[index].reduction_dommages(degats)
                 self.procedure_attaque(degats,equipe_ennemie.membres[index])
 
     def tempete(self,equipe_ennemie,cible):
@@ -14367,11 +14371,11 @@ class ChevalierMagique(Monstre):
                     cible.jauge_attaque-=max(30,Arrondir.a_l_unite(0.3*cible.jauge_attaque))
         print('\n',self.surnom,self.attribut,' soulève une tempête qui touche toute l\'équipe ennemie!!\n')
         for index in range(equipe_ennemie.len):
-            if(Equipe.is_alive(equipe_ennemie)):
+            if(equipe_ennemie.is_alive()):
                 degats=self.calcul_dommages(1,self.capacite3_bonus_skill,equipe_ennemie.membres[index])
                 self.affichage_du_type_de_coup(1,self.capacite3_bonus_skill,degats,equipe_ennemie.membres[index])
                 degats+=Arrondir.a_l_unite(0.06*self.pv_max_donjons)
-                degats=self.reduction_dommages(equipe_ennemie.membres[index],degats)
+                degats=equipe_ennemie.membres[index].reduction_dommages(degats)
                 self.procedure_attaque(degats,equipe_ennemie.membres[index])
                 if(equipe_ennemie.membres[index].immunite==0):
                     effet_nefaste=random.randint(1,100)
@@ -14383,11 +14387,11 @@ class ChevalierMagique(Monstre):
     def projectiles(self,equipe_ennemie):
         print('\n',self.surnom,self.attribut,' attaque toute l\'équipe ennemie avec quatre projectiles magiques aléatoires!!\n')
         for index in range(4):
-            if(Equipe.is_alive(equipe_ennemie)):
+            if(equipe_ennemie.is_alive()):
                 indice_cible=random.randint(0,equipe_ennemie.len-1)
-                while(equipe_ennemie[indice_cible].pv_actuels<=0):
+                while(equipe_ennemie.membres[indice_cible].pv_actuels<=0):
                     indice_cible=random.randint(0,equipe_ennemie.len-1)
-                cible=equipe_ennemie[indice_cible]
+                cible=equipe_ennemie.membres[indice_cible]
                 degats=self.calcul_dommages(1.9,self.capacite2_bonus_skill,cible)
                 self.affichage_du_type_de_coup(1.9,self.capacite2_bonus_skill,degats,cible)
                 degats=cible.reduction_dommages(degats)
@@ -14402,10 +14406,10 @@ class ChevalierMagique(Monstre):
         self.vol_de_vie+=50
         print('\n',self.surnom,self.attribut,' aspire les forces de toute l\'équipe ennemie avec un vortex magique!!\n')
         for index in range(equipe_ennemie.len):
-            if(Equipe.is_alive(equipe_ennemie) and equipe_ennemie.membres[index].pv_actuels>0):
+            if(equipe_ennemie.is_alive() and equipe_ennemie.membres[index].pv_actuels>0):
                 degats=self.calcul_dommages(4.8,self.capacite3_bonus_skill,equipe_ennemie.membres[index])
                 self.affichage_du_type_de_coup(4.8,self.capacite3_bonus_skill,degats,equipe_ennemie.membres[index])
-                degats=self.reduction_dommages(equipe_ennemie.membres[index],degats)
+                degats=equipe_ennemie.membres[index].reduction_dommages(degats)
                 self.procedure_attaque(degats,equipe_ennemie.membres[index])
                 if(equipe_ennemie.membres[index].immunite==0):
                     effet_nefaste=random.randint(1,100)
@@ -14446,18 +14450,18 @@ class ChevalierMagique(Monstre):
             equipe_alliee.membres[index].etre_soigne(montant)
 
     def altruisme(self,cible,equipe_alliee):
-        pv_min=equipe_alliee[0].pv_actuels
+        pv_min=equipe_alliee.membres[0].pv_actuels
         indice_du_min=0
         for index in range(equipe_alliee.len):
             if(equipe_alliee.membres[index].pv_actuels<pv_min):
                 pv_min=equipe_alliee.membres[index].pv_actuels
                 indice_du_min=i
-        print('\n',equipe_alliee[indice_du_min].surnom,equipe_alliee[indice_du_min].attribut,' guérit grâce à l\'aura de ',self.surnom,self.attribut,'!!')
-        montant=Arrondir.a_l_unite(0.15*equipe_alliee[indice_du_min].pv_max_donjons)
+        print('\n',equipe_alliee.membres[indice_du_min].surnom,equipe_alliee.membres[indice_du_min].attribut,' guérit grâce à l\'aura de ',self.surnom,self.attribut,'!!')
+        montant=Arrondir.a_l_unite(0.15*equipe_alliee.membres[indice_du_min].pv_max_donjons)
         equipe_alliee.membres[indice_du_min].etre_soigne(montant)
         aleatoire=random.randint(1,100)
         if(aleatoire<=35):
-            self.retirer_un_bonus(cible)
+            cible.retirer_un_bonus()
 
     def feu_vengeur(equipe_alliee):
         for index in range(equipe_alliee.len):
@@ -14797,9 +14801,9 @@ class Vampire(Monstre):
                 print(equipe_alliee.membres[index].surnom,equipe_alliee.membres[index].attribut,' perd un dixième de ses PV max!!')
             elif(equipe_alliee.membres[index].nom=='Vampire' and equipe_alliee.membres[index].attribut=='Lumière'):
                 indice_vampire=i
-        if(montant>0 and equipe_alliee[indice_vampire].sans_resurrection<=0):
-            print(equipe_alliee[indice_vampire].surnom,equipe_alliee[indice_vampire].attribut,' revient à la vie avec ',montant,' points de vie!!\n')
-            equipe_alliee[indice_vampire].pv_actuels=montant
+        if(montant>0 and equipe_alliee.membres[indice_vampire].sans_resurrection<=0):
+            print(equipe_alliee.membres[indice_vampire].surnom,equipe_alliee.membres[indice_vampire].attribut,' revient à la vie avec ',montant,' points de vie!!\n')
+            equipe_alliee.membres[indice_vampire].pv_actuels=montant
 
     def vitesse_donjons(equipe_alliee):
         for index in range(equipe_alliee.len):
@@ -15148,17 +15152,17 @@ class Phenix(Monstre): # Blast
     def blizzard(self,equipe_ennemie):
         print('\n',self.surnom,self.attribut,' engloutit toute l\'équipe ennemie dans un puissant blizzard!!\n')
         for index in range(equipe_ennemie.len):
-            if(Equipe.is_alive(equipe_ennemie) and equipe_ennemie.membres[index].pv_actuels>0):
+            if(equipe_ennemie.is_alive() and equipe_ennemie.membres[index].pv_actuels>0):
                 degats=self.calcul_dommages(3,self.capacite3_bonusS_skill,equipe_ennemie.membres[index])
                 type_coup=self.affichage_du_type_de_coup(3,self.capacite3_bonus_skill,degats,equipe_ennemie.membres[index])
-                degats=self.reduction_dommages(equipe_ennemie.membres[index],degats)
+                degats=equipe_ennemie.membres[index].reduction_dommages(degats)
                 degats+=Arrondir.a_l_unite(0.12*equipe_ennemie.membres[index].pv_max_donjons)
                 self.procedure_attaque(degats,equipe_ennemie.membres[index])
                 if(equipe_ennemie.membres[index].immunite==0):
                     effet_nefaste=random.randint(1,100)
                     limite_reussite=Calcul.taux_reussite_effet(1,equipe_ennemie.membres[index].resistance_actuelle,self.precision_actuelle)
                     if(effet_nefaste<=100*limite_reussite):
-                        self.atk_break(equipe_ennemie.membres[index],2)
+                        equipe_ennemie.membres[index].atk_break(2)
                     if(type_coup=='Critique'):
                         print(equipe_ennemie.membres[index].surnom,equipe_ennemie.membres[index].attribut,' est gelé(e)!!\n')
                         equipe_ennemie.membres[index].gel=1
@@ -15166,10 +15170,10 @@ class Phenix(Monstre): # Blast
     def tempete(self,equipe_ennemie):
         print('\n',self.surnom,self.attribut,' engloutit toute l\'équipe ennemie dans une violente tempête!!\n')
         for index in range(equipe_ennemie.len):
-            if(Equipe.is_alive(equipe_ennemie) and equipe_ennemie.membres[index].pv_actuels>0):
+            if(equipe_ennemie.is_alive() and equipe_ennemie.membres[index].pv_actuels>0):
                 degats=self.calcul_dommages(4.5,self.capacite3_bonus_skill,equipe_ennemie.membres[index])
                 self.affichage_du_type_de_coup(4.5,self.capacite3_bonus_skill,degats,equipe_ennemie.membres[index])
-                degats=self.reduction_dommages(equipe_ennemie.membres[index],degats)
+                degats=equipe_ennemie.membres[index].reduction_dommages(degats)
                 self.procedure_attaque(degats,equipe_ennemie.membres[index])
                 if(equipe_ennemie.membres[index].pv_actuels<=0):
                     print('\n',self.surnom,self.attribut,' a tué quelqu\'un et voit donc son temps de recharge réduit à zéro!!')
@@ -15181,14 +15185,14 @@ class Phenix(Monstre): # Blast
     def purification(self,equipe_ennemie):
         print('\n',self.surnom,self.attribut,' éblouit toute l\'équipe ennemie d\'une lumière aveuglante!!\n')
         for index in range(equipe_ennemie.len):
-            if(Equipe.is_alive(equipe_ennemie) and equipe_ennemie.membres[index].pv_actuels>0):
-                nb_effets_bonus=self.nb_effets_renforcement(equipe_ennemie.membres[index])
-                equipe_ennemie.membres[index]=self.soigner_de_tous_les_biens(equipe_ennemie.membres[index])
+            if(equipe_ennemie.is_alive() and equipe_ennemie.membres[index].pv_actuels>0):
+                nb_effets_bonus=equipe_ennemie.membres[index].nb_effets_renforcement()
+                equipe_ennemie.membres[index].soigner_de_tous_les_biens()
                 if(nb_effets_bonus>0):
-                    self.def_break(equipe_ennemie.membres[index],1)
+                    equipe_ennemie.membres[index].def_break(1)
                 degats=self.calcul_dommages(4.5,self.capacite3_bonus_skill,equipe_ennemie.membres[index])
                 self.affichage_du_type_de_coup(4.5,self.capacite3_bonus_skill,degats,equipe_ennemie.membres[index])
-                degats=self.reduction_dommages(equipe_ennemie.membres[index],degats)
+                degats=equipe_ennemie.membres[index].reduction_dommages(degats)
                 self.procedure_attaque(degats,equipe_ennemie.membres[index])
 
     ''' Passif de fin de tour pour Phénix Feu'''

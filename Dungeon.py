@@ -855,7 +855,7 @@ class MontTagne:
         Monstre.evoluer(demi_boss2)
         while(demi_boss2.niveau!=4):
             Monstre.monter_en_niveau_sans_affichage(demi_boss2)
-        demi_boss2.nom='Grand spectre bleu'
+        demi_boss2.surnom='Grand spectre bleu'
     
         monstre5=Spectre()
         while(monstre5.attribut!='Vent'):
@@ -1348,14 +1348,14 @@ class CratereAter():
             monstre1=SoldatSquelette()
         while(monstre1.niveau!=4):
             Monstre.monter_en_niveau_sans_affichage(monstre1)
-        monstre1.surnom='Soldat squelette bleu 1'
+        monstre1.surnom='Soldat squelette vert'
     
         monstre2=SoldatSquelette()
         while(monstre2.attribut!='Eau'):
             monstre2=SoldatSquelette()
         while(monstre2.niveau!=4):
             Monstre.monter_en_niveau_sans_affichage(monstre2)
-        monstre2.surnom='Soldat squelette bleu 2'
+        monstre2.surnom='Soldat squelette bleu'
     
         demi_boss1=SoldatSquelette()
         while(demi_boss1.attribut!='Eau'):
