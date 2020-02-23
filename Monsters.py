@@ -5118,8 +5118,6 @@ class SoldatSquelette(Monstre):
                 degats=equipe_ennemie.membres[index].reduction_dommages(degats)
                 self.procedure_attaque(degats,equipe_ennemie.membres[index])
                 if(self.priorite_elementaire(equipe_ennemie.membres[index])):
-                    print(equipe_ennemie.membres,'\n',index,'\n\n')
-                    print(equipe_ennemie.membres[index] == 0,'\n\n')
                     equipe_ennemie.membres[index].perturbation_recuperation(2)
 
 
@@ -8315,12 +8313,12 @@ class Esprit(Monstre):
         if(nb_allies>0):
             pv_min=equipe_alliee.membres[0].pv_actuels
             indice_allie_a_soigner=0
-            i=0
-            while(i<=nb_allies-1):
+            index=0
+            while(index <= nb_allies-1):
                 if(equipe_alliee.membres[index].pv_actuels<pv_min):
                     pv_min=equipe_alliee.membres[index].pv_actuels
-                    indice_allie_a_soigner=i
-                i+=1
+                    indice_allie_a_soigner=index
+                index+=1
             montant=Arrondir.a_l_unite(0.15*equipe_alliee.membres[indice_allie_a_soigner].pv_max_donjons)
             equipe_alliee.membres[indice_allie_a_soigner].etre_soigne(montant)
         ''' Verifier que la jauge d'attaque ne réaugmente pas immédiatement ex. de 15 '''
@@ -14424,7 +14422,7 @@ class ChevalierMagique(Monstre):
         print('\n',self.surnom,self.attribut,' tire des balles magiques sur ',cible.surnom,cible.attribut,'!!\n')
         for index in range(3):
             degats=self.calcul_dommages(2.1,self.capacite2_bonus_skill,cible)
-            self.affichage_type_de_coup(self,2.1,self.capacite2_bonus_skill,degats,cible)
+            self.affichage_du_type_de_coup(self,2.1,self.capacite2_bonus_skill,degats,cible)
             if(self.attribut=='Feu' and cible.pv_actuels > self.pv_actuels):
                 degats+=Arrondir.a_l_unite(0.5*degats)
             degats=cible.reduction_dommages(degats)
@@ -14455,7 +14453,7 @@ class ChevalierMagique(Monstre):
         for index in range(equipe_alliee.len):
             if(equipe_alliee.membres[index].pv_actuels<pv_min):
                 pv_min=equipe_alliee.membres[index].pv_actuels
-                indice_du_min=i
+                indice_du_min=index
         print('\n',equipe_alliee.membres[indice_du_min].surnom,equipe_alliee.membres[indice_du_min].attribut,' guérit grâce à l\'aura de ',self.surnom,self.attribut,'!!')
         montant=Arrondir.a_l_unite(0.15*equipe_alliee.membres[indice_du_min].pv_max_donjons)
         equipe_alliee.membres[indice_du_min].etre_soigne(montant)
@@ -14800,7 +14798,7 @@ class Vampire(Monstre):
                 equipe_alliee.membres[index].pv_actuels-=Arrondir.a_l_unite(0.1*equipe_alliee.membres[index].pv_max_donjons)
                 print(equipe_alliee.membres[index].surnom,equipe_alliee.membres[index].attribut,' perd un dixième de ses PV max!!')
             elif(equipe_alliee.membres[index].nom=='Vampire' and equipe_alliee.membres[index].attribut=='Lumière'):
-                indice_vampire=i
+                indice_vampire=index
         if(montant>0 and equipe_alliee.membres[indice_vampire].sans_resurrection<=0):
             print(equipe_alliee.membres[indice_vampire].surnom,equipe_alliee.membres[indice_vampire].attribut,' revient à la vie avec ',montant,' points de vie!!\n')
             equipe_alliee.membres[indice_vampire].pv_actuels=montant

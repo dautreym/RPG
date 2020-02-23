@@ -31,9 +31,11 @@ from Runes_and_Objects import *
 # 1) Pour les capacités des monstres : beaucoup de choses à modifier
 #       Corriger les aptitudes leader, anti_aptitudes_leader et leurs affichages
 #           Bien faire les Arrondir.a_l_unite() partout
-#       Corriger en combat la gestion des équipiers morts (crash du random.randint(0,0))
 #       Tester à nouveau les capacités de tous les monstres avec un Main_test.py
 
+# 2) Rajouter des graphismes :
+#       Regarder les applications offertes par les bibliothèques suivantes :
+#           Pygame, Pyglet, Cocos2d, PySFML 
 
 
 class Game:

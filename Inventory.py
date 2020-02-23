@@ -238,7 +238,7 @@ class Inventaire:
         print('Acheter des parchemins = 0')
         print('Acheter des runes = 1')
         print('Vendre un objet = 2')
-        print('Tout autre choix vous renverra au menu principal')
+        print('Revenir au menu principal = 3')
         # Le game.possibilites se fait après le retour de cette fonction. Ce n'est pas un oubli !
 
         entree=input('\n Que voulez-vous faire ? ')
