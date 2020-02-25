@@ -386,14 +386,32 @@ class Game:
                 equipe_allies.membres[index] = monstre
                 self.stockage[index] = monstre
 
-        monstre6=Sylphe()
-        while(monstre6.attribut!='Vent'):
+        if(self.niveau_donjon.nom == 'les Ruines de Senzargen Niveau 7 - Autel Sacrificiel '):
             monstre6=Sylphe()
-        while(monstre6.niveau!=14):
-            Monstre.monter_en_niveau_sans_affichage(monstre6)
-        monstre6.surnom='Arashi la Tempête'
-        if(self.niveau_donjon.region == 3):
-            equipe_ennemis.membres[0]=monstre6
+            while(monstre6.attribut!='Vent'):
+                monstre6=Sylphe()
+            while(monstre6.niveau!=14):
+                Monstre.monter_en_niveau_sans_affichage(monstre6)
+            monstre6.surnom='Arashi la Tempête'
+            if(self.niveau_donjon.region == 3):
+                equipe_ennemis.membres[0]=monstre6
+
+        if(self.niveau_donjon.nom == 'le Mont Tagne Niveau 7 - Caverne au Sommet '):
+            boss=Golem()
+            while(boss.attribut!='Feu'):
+                boss=Golem()
+            Monstre.evoluer(boss)
+            while(boss.niveau!=8):
+                Monstre.monter_en_niveau_sans_affichage(boss)
+            boss.surnom='Golem rouge Royal'
+            boss.defense_max_donjons=2*boss.defense_max_donjons
+            boss.defense=2*boss.defense
+            boss.defense_actuelle=boss.defense_max_donjons
+            boss.pv_max_donjons=2*boss.pv_max_donjons
+            boss.pv=2*boss.pv
+            boss.pv_actuels=2*boss.pv_actuels
+            if(self.niveau_donjon.region == 3):
+                equipe_ennemis.membres[0] = boss
 
         self.recompenses_donnees=[0,0,0,0]
 
