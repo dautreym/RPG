@@ -12,8 +12,11 @@ import math
 import sys
 from ast import literal_eval
 
+from Graphism_ForetVeur import *
+
 #from Runes_and_Objects import *
 #from Dungeon import *
+
 
 '''
 from Base import *
@@ -258,8 +261,9 @@ class Monstre:
         if(montant > 0 and self.perturbation_recup <= 0):
             pv_actuels_tmp=self.pv_actuels
             if (montant+self.pv_actuels >= self.pv_max_donjons):
-                self.pv_actuels=self.pv_max_donjons
-                print(self.surnom,self.attribut,' récupère ',self.pv_max_donjons-pv_actuels_tmp,'points de vie!! \n')
+                if(self.pv_actuels < self.pv_max_donjons):
+                    self.pv_actuels=self.pv_max_donjons
+                    print(self.surnom,self.attribut,' récupère ',self.pv_max_donjons-pv_actuels_tmp,'points de vie!! \n')
             else:
                 self.pv_actuels+=montant
                 print(self.surnom,self.attribut,' récupère ',montant,'points de vie!! \n')
@@ -1949,7 +1953,14 @@ class Monstre:
             if(reussite_effet <= self.chances_tour_supplementaire):
                 self.tour_supplementaire_tmp+=1
 
-        print("C'est au tour de ", self.surnom, self.attribut, " : ", "\n")
+        # La fonction graphism sera utilisée pour la partie gauche de la fenêtre
+        # La fonction graphism_simple sera utilisée pour la partie droite de la fenêtre 
+        dimensions_fenetre = [2*617,480]
+        fenetre = initialisation_fenetre(dimensions_fenetre)
+
+        message = "C'est au tour de " + self.surnom + " " + self.attribut + " : "
+        graphism(fenetre,dimensions_fenetre,team_ennemis,[618,[message]])
+        # print("C'est au tour de ", self.surnom, self.attribut, " : ", "\n")
         while(self.tour_supplementaire_tmp >= 0):
             self.debut_de_tour()
             if(self.pv_actuels > 0):
@@ -2024,16 +2035,24 @@ class Monstre:
                                 else:
                                     positions_ennemis=['de gauche','du centre','de droite']
                                     possibilites_cible=[0,1,2]
-                                
+                            
+                            '''
                             if(place_leader < 3):
                                 print(team_ennemis.membres[0].surnom,positions_ennemis[place_leader],' = ',place_leader,'(',team_ennemis.membres[0].pv_actuels,'PV restants)')
                             if(team_ennemis.len > 1 and place_membre_1 < 3):
                                 print(team_ennemis.membres[1].surnom,positions_ennemis[place_membre_1],' = ',place_membre_1,'(',team_ennemis.membres[1].pv_actuels,'PV restants)')
                             if(team_ennemis.len > 2 and place_membre_2 < 3):
                                 print(team_ennemis.membres[2].surnom,positions_ennemis[place_membre_2],' = ',place_membre_2,'(',team_ennemis.membres[2].pv_actuels,'PV restants)')
-                            
-                            capacite_choisie=self.choisir_capacite_speciale()
+                            '''
+
+                            retour_choix_capacite_speciale = self.choisir_capacite_speciale(fenetre,dimensions_fenetre,team_ennemis,team_allies)
+
+                            capacite_choisie = retour_choix_capacite_speciale[0]
+                            indice_capacite_choisie = retour_choix_capacite_speciale[1]
+                            liste_de_messages = retour_choix_capacite_speciale[2]
+
                             if((capacite_choisie not in capacites_anormales) or (capacite_choisie in capacites_soin_allie_avec_hit) or (capacite_choisie in capacites_attaque_en_groupe) or (capacite_choisie in capacites_hit_multicibles)):
+                                '''
                                 entree=input('Quelle cible voulez-vous attaquer ? ')
                                 while(not Security.is_decimal(entree)):
                                     entree=input('Quelle cible voulez-vous attaquer ? ')
@@ -2043,6 +2062,8 @@ class Monstre:
                                     while(not Security.is_decimal(entree)):
                                         entree=input('Quelle cible voulez-vous attaquer ? ')
                                     indice_cible=int(entree)
+                                '''
+                                indice_cible = graphism(fenetre,dimensions_fenetre,team_ennemis, [1,indice_capacite_choisie,liste_de_messages])
 
                                 if(indice_cible == place_leader):
                                     cible=team_ennemis.membres[0]
@@ -2450,7 +2471,7 @@ class Monstre:
             print('Il reste ',cible.pv_actuels,' point(s) de vie sur',cible.pv_max_donjons,' à ',cible.surnom,cible.attribut,'!! \n')
 
 
-    ''' +1 pour certains effets pour pouvoir bénéficier des bonus/malus s'ils ne durent qu'un tour '''
+    # +1 pour certains effets pour pouvoir bénéficier des bonus/malus s'ils ne durent qu'un tour 
 
     def slow_down(self,nb_tours):
         if(self.immunite <= 0):
@@ -2858,27 +2879,41 @@ class Monstre:
             Avantage=True
         return Avantage
 
-    def choisir_capacite_speciale(self):
-        print('\n Vous pouvez utiliser l une des capacités suivantes : ')
+    def choisir_capacite_speciale(self,fenetre,dimensions_fenetre,team_ennemis,team_allies):
+        liste_de_messages = ["Vous pouvez utiliser l'une des capacités suivantes : "]
+        # print('\n Vous pouvez utiliser l\'une des capacités suivantes : ')
         possibilites_capacite_speciale=[]
         
         if (self.etat_cap1 == 'dispo'):
-            print(self.capacite1_nom,' = 1')
+            liste_de_messages.append("Capacité 1 : " + self.capacite1_nom)
+            # print(self.capacite1_nom,' = 1')
             possibilites_capacite_speciale.append(1)
         if(self.silencieux <= 0):
             if(self.nb_capacites >= 2):
                 if (self.etat_cap2 == 'dispo'):
-                    print(self.capacite2_nom,' = 2')
+                    liste_de_messages.append("Capacité 2 : " + self.capacite2_nom)
+                    # print(self.capacite2_nom,' = 2')
                     possibilites_capacite_speciale.append(2)
             if(self.nb_capacites >= 3):
                 if (self.etat_cap3 == 'dispo'):
-                    print(self.capacite3_nom,' = 3')
+                    liste_de_messages.append("Capacité 3 : " + self.capacite3_nom)
+                    # print(self.capacite3_nom,' = 3')
                     possibilites_capacite_speciale.append(3)
             if(self.nb_capacites >= 4):
                 if (self.etat_cap4 == 'dispo'):
-                    print(self.capacite4_nom,' = 4')
+                    liste_de_messages.append("Capacité 4 : " + self.capacite4_nom)
+                    # print(self.capacite4_nom,' = 4')
                     possibilites_capacite_speciale.append(4)
         
+        liste_de_messages.append('***** Recapitulatif *****')
+        for index in range(team_allies.len):
+            liste_de_messages.append(team_allies.membres[index].surnom + team_allies.membres[index].attribut  + " : " + str(team_allies.membres[index].pv_actuels) + " PV")
+            liste_de_messages.append('Jauge d\'attaque : ' + str(team_allies.membres[index].jauge_attaque))
+        liste_de_messages.append('*************************')
+        graphism_simple(fenetre,dimensions_fenetre,team_ennemis,[616,liste_de_messages])
+        choix = graphism_simple(fenetre,dimensions_fenetre,team_ennemis,[617,liste_de_messages,possibilites_capacite_speciale])
+
+        '''
         entree=input('Quelle capacité voulez-vous utiliser ? ')
         while(not Security.is_decimal(entree)):
             entree=input('\nQuelle capacité voulez-vous utiliser ? ')
@@ -2888,7 +2923,8 @@ class Monstre:
             while(not Security.is_decimal(entree)):
                 entree=input('\nQuelle capacité voulez-vous utiliser ? ')
             choix=int(entree)
-        
+        '''
+
         if (choix == 1):
             capacite_choisie=self.capacite1
             self.attente1=self.temps_recharge1
@@ -2905,7 +2941,10 @@ class Monstre:
             capacite_choisie=self.capacite4
             self.attente4=self.temps_recharge4
             self.etat_cap4='Non dispo'
-        return capacite_choisie
+        
+        return [capacite_choisie, choix, liste_de_messages]
+
+
 
     def choisir_capacite_speciale_sans_affichage(self):
         possibilites_capacite_speciale=[]
@@ -5745,7 +5784,7 @@ class Lutin(Monstre):
 
             self.nb_capacites=2
 
-            self.capacite1=Lutin.SphereSacree
+            self.capacite1=Lutin.sphere_sacree
             self.capacite1_nom='Sphère Sacrée'
             self.capacite1BonusSkill=0
             self.temps_recharge1=1
@@ -7824,7 +7863,7 @@ class Salamandre(Monstre):
 
             self.nb_capacites=3
 
-            self.capacite1=Salamandre.Tourbillon
+            self.capacite1=Salamandre.tourbillon
             self.capacite1_nom='Tourbillon'
             self.capacite1BonusSkill=0
             self.temps_recharge1=1
@@ -13403,7 +13442,7 @@ class Sylphe(Monstre): # Arashi
             self.capacite3_bonus_skill=0
             self.temps_recharge3=5
             self.attente3=0
-            self.eta_cap3='dispo'
+            self.etat_cap3='dispo'
 
             self.presence_leader_skill=1
             self.leader_skill=Sylphe.vitesse_arena

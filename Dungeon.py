@@ -65,7 +65,7 @@ class Donjon:
             if (self.region==2):
                 equipe_adverse=Equipe(game,[self.monstre3,self.demi_boss2,self.monstre4],3)
             if (self.region==3):
-                equipe_adverse=Equipe(game,self.boss,0,0)
+                equipe_adverse=Equipe(game,[self.boss],1)
         elif(self.nom=='le Cratère Ater Niveau 7 - Caverne des Profondeurs '):
             if (self.region==1):
                 equipe_adverse=Equipe(game,[self.monstre1,self.demi_boss1,self.monstre2],3)
@@ -120,12 +120,12 @@ class ForetVeur:
         monstre1=Sanglier()
         while(monstre1.attribut!='Vent'):
             monstre1=Sanglier()
-        monstre1.surnom='Sanglier vert'
+        monstre1.surnom='Orc de gauche'
 
         monstre2=Sanglier()
         while(monstre2.attribut!='Feu'):
             monstre2=Sanglier()
-        monstre2.surnom='Sanglier rouge'
+        monstre2.surnom='Orc de droite'
 
         demi_boss1=Sanglier()
         while(demi_boss1.attribut!='Vent'):
@@ -1183,6 +1183,9 @@ class MontTagne:
         boss.defense_max_donjons=2*boss.defense_max_donjons
         boss.defense=2*boss.defense
         boss.defense_actuelle=boss.defense_max_donjons
+        boss.pv_max_donjons=2*boss.pv_max_donjons
+        boss.pv=2*boss.pv
+        boss.pv_actuels=2*boss.pv_actuels
         XP_recompense=842
         recompense=[XP_recompense,MontTagne.recompenses(niveau)]
         caracteristiques=[nom,niveau,attribut,monstre1,monstre2,monstre3,monstre4,monstre5,monstre6,demi_boss1,demi_boss2,boss,recompense,nom_famille]

@@ -29,6 +29,7 @@ class Equipe:
         self.membres=liste_de_monstres
         self.len=taille # paramètre indépendant de self.membres
         self.base=game
+        self.nom_niveau_donjon='' # utilisé pour les graphismes 
         # On aurait pu faire Game.__init__(self) pour pouvoir utiliser self.stockage
         # Mais le stockage appartient à une base de référence pour une équipe (plus clair je trouve)
 
@@ -445,6 +446,9 @@ class Equipe:
             fin=True
         return fin
         
+
+
+
     ''' IDEE : RETENIR LES INDICES DE STOCKAGE DAND LA BASE DE L EQUIPE AVANT COMBAT '''
     ''' APRES FIN DU COMBAT, RECONSTITUER EQUIPE => PAS BESOIN DE FAIRE GAFFE AUX .pop '''
     def combat_xVx_avec_capacites_speciales(self,ennemis):
@@ -534,19 +538,14 @@ class Equipe:
                         self.tick()
                         ennemis.tick()
                         
-                        str(input(' > '))
+                        # str(input(' > '))
 
-                        '''
-                        if((persos[l] in allies) and isAlive(ennemis)):
-                            Action(persos[l],allies,ennemis)
-                            persos[l].tour_supplementaire_tmp=0
-                        elif((persos[l] in ennemis) and isAlive(allies)):
-                            Action(persos[l],allies,ennemis)
-                            persos[l].tour_supplementaire_tmp=0
-                        else:
-                            break
-                        '''
             if(self.fin_du_combat(ennemis)):
+                dimensions_fenetre = [2*617,480]
+                fenetre = pygame.display.set_mode((dimensions_fenetre[0], dimensions_fenetre[1]))
+                pygame.display.flip()
+                pygame.quit()
+                # FERMER LA FENETRE car sinon rien ne le fait pour nous !!!
                 print('Le combat est terminé. \n\n')
         if(self.is_alive()):
             vainqueur='allies'

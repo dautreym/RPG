@@ -45,9 +45,9 @@ class Game:
         self.place_dernier_monstre=0
         self.sac=sac_donne
         self.donjons_possibles=[ForetVeur(),CratereAter(),MontTagne(),RuinesSenzargen()]
-        # Varaible initialisée au moment du choix du donjon et de son niveau  
-        self.donjon=[]
-        self.niveau_donjon=[]
+        # Variable initialisée au moment du choix du donjon et de son niveau  
+        self.donjon=[] # Donjon choisi temporairement 
+        self.niveau_donjon=[] # Niveau du donjon (aussi un donjon) choisi temporairement 
         self.choix_map=-1
         
         self.niveaux_donjons_debloques=[1]
@@ -59,9 +59,9 @@ class Game:
         self.monstres_dispo_trois_etoiles_nom=['Fee','DameHarpie','Inugami','Mastodonte','Golem','Serpent','Griffon','Inferno','HautElementaire','OursDeCombat','LoupGarou','Elfe']
         self.monstres_dispo_quatre_etoiles_nom=['Vampire','Elfe','ChevalierMagique']
         self.monstres_dispo_cinq_etoiles_nom=['Vampire','Phénix']
-        self.recompenses_donnees=[0,0,0]
+        self.recompenses_donnees=[0,0,0,0]
 
-        self.recompenses_globales=[Elfe(),[Fee(),Fee()],ChevalierMagique()]
+        self.recompenses_globales=[Elfe(),[Fee(),Fee()],ChevalierMagique(),Vampire()]
         while(self.recompenses_globales[0].attribut != 'Lumière'):
             self.recompenses_globales[0]=Elfe()
         while(self.recompenses_globales[1][0].attribut != 'Lumière'):
@@ -70,8 +70,10 @@ class Game:
             self.recompenses_globales[1][1]=Fee()
         while(self.recompenses_globales[2].attribut != 'Eau'):
             self.recompenses_globales[2]=ChevalierMagique()
+        while(self.recompenses_globales[3].attribut != 'Feu'):
+            self.recompenses_globales[3]=Vampire()
 
-        self.types_recompenses_globales=['Monstre','Monstres','Monstre'] # A CHANGER EN monstreS
+        self.types_recompenses_globales=['Monstre','Monstres','Monstre','Monstre'] # A CHANGER EN monstreS
         
         self.recompenses_globales_totales=[self.recompenses_donnees,self.recompenses_globales,self.types_recompenses_globales]
 
@@ -358,16 +360,64 @@ class Game:
         '''
         
         equipe_ennemis=self.niveau_donjon.monstres_region(self)
+        equipe_ennemis.nom_niveau_donjon = self.niveau_donjon.nom
+
+        # A ENLEVER !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        '''
+        for index in range(equipe_allies.len):
+            if (equipe_allies.membres[index] == 'ChevalierMagique'):
+                nom_tmp = equipe_allies.membres[index].nom
+                attribut_tmp = equipe_allies.membres[index].attribut
+                classe_tmp = equipe_allies.membres[index].classe
+                niveau_tmp = equipe_allies.membres[index].niveau
+                XP_tmp = equipe_allies.membres[index].XP_avant_prochain_niveau
+                indice_stockage_tmp = equipe_allies.membres[index].indice_stockage_base
+
+                monstre=Monstre.reset_monstre(nom_tmp)
+                while(monstre.attribut!=attribut_tmp):
+                    monstre=Monstre.reset_monstre(nom_tmp)
+                while(monstre.classe != classe_tmp):
+                    monstre.Evoluer()
+                while(monstre.niveau != niveau_tmp):
+                    monstre.monter_en_niveau_sans_affichage()
+
+                monstre.XP_avant_prochain_niveau = XP_tmp
+                monstre.indice_stockage_base=indice_stockage_tmp
+                equipe_allies.membres[index] = monstre
+                self.stockage[index] = monstre
+
+        monstre6=Sylphe()
+        while(monstre6.attribut!='Vent'):
+            monstre6=Sylphe()
+        while(monstre6.niveau!=14):
+            Monstre.monter_en_niveau_sans_affichage(monstre6)
+        monstre6.surnom='Arashi la Tempête'
+        if(self.niveau_donjon.region == 3):
+            equipe_ennemis.membres[0]=monstre6
+
+        self.recompenses_donnees=[0,0,0,0]
+
+        self.recompenses_globales=[Elfe(),[Fee(),Fee()],ChevalierMagique(),Vampire()]
+
+        while(self.recompenses_globales[3].attribut != 'Feu'):
+            self.recompenses_globales[3]=Vampire()
+
+        self.types_recompenses_globales=['Monstre','Monstres','Monstre','Monstre'] # A CHANGER EN monstreS
+        
+        self.recompenses_globales_totales=[self.recompenses_donnees,self.recompenses_globales,self.types_recompenses_globales]
+        '''
+        # JUSQU'ICI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 
-        ''' On réinitialise ici toutes les stats max_donjons '''
-        ''' Pas besoin de les modifier dans les Anti '''
+        # On réinitialise ici toutes les stats max_donjons 
+        # Pas besoin de les modifier dans les Anti 
         for index in range(equipe_ennemis.len):
             equipe_ennemis.membres[index].preparer_au_combat()
 
-        ''' Si ForetVeur Niveau 1, region = 3 mais on prépare quand même au combat '''
+        # Si ForetVeur Niveau 1, region = 3 mais on prépare quand même au combat 
         if(self.niveau_donjon.region == 1 or (self.niveau_donjon.nom_famille == 'ForetVeur' and self.niveau_donjon.niveau == 1)):
             for index in range(equipe_allies.len):
                 equipe_allies.membres[index].preparer_au_combat()
+
 
         survivants=equipe_allies.combat_xVx_avec_capacites_speciales(equipe_ennemis)
         equipe_ennemis.soigner_team_ennemie()
