@@ -2907,7 +2907,7 @@ class Monstre:
         
         liste_de_messages.append('***** Recapitulatif *****')
         for index in range(team_allies.len):
-            liste_de_messages.append(team_allies.membres[index].surnom + team_allies.membres[index].attribut  + " : " + str(team_allies.membres[index].pv_actuels) + " PV")
+            liste_de_messages.append(team_allies.membres[index].surnom + " " + team_allies.membres[index].attribut  + " : " + str(team_allies.membres[index].pv_actuels) + " PV")
             liste_de_messages.append('Jauge d\'attaque : ' + str(team_allies.membres[index].jauge_attaque))
         liste_de_messages.append('*************************')
         graphism_simple(fenetre,dimensions_fenetre,team_ennemis,[616,liste_de_messages])
