@@ -190,9 +190,29 @@ def graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 	fond = initialisation_background(fenetre)
 	monstres = initialisation_monstres(fenetre,dimensions_fenetre,equipe_ennemis,1)
 	police = pygame.font.SysFont("arial", 16)
+	right_arrow = pygame.image.load("Graphism/right_arrow.gif").convert_alpha()
 	
 	index_targeted_personnage = 0
-	right_arrow = pygame.image.load("Graphism/right_arrow.gif").convert_alpha()
+	index = 0
+	nb_ennemis_vivants = 0
+	while(index < equipe_ennemis.len):
+		if(equipe_ennemis.membres[index].pv_actuels > 0):
+			nb_ennemis_vivants += 1
+		index += 1
+
+	index = 0
+	while(index < equipe_ennemis.len):
+		if(equipe_ennemis.membres[0].pv_actuels <= 0):
+			if(equipe_ennemis.membres[1].pv_actuels <= 0):
+				index_targeted_personnage = 2
+			else:
+				index_targeted_personnage = 1
+		# else: index_targeted_personnage est déjà initialisé à 0 
+		index += 1
+
+	if(index_targeted_personnage == 3):
+		print('Erreur majeure 0\n')
+		system.exit()
 
 	# Code pour indication : liste de deux éléments (un pour le type d'action, l'autre pour le contenu)
 	# Si indication[0] = 0 : afficher à gauche une liste de messages contenue dans indication[1]
@@ -231,15 +251,10 @@ def graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 				# Liste complète des possibilités à la place de K_RIGHT, LEFT, UP, DOWN :
 				# https://openclassrooms.com/fr/courses/1399541-interface-graphique-pygame-pour-python/1399995-gestion-des-evenements-1
 		
-				if event.type == KEYDOWN:
-					index = 0
-					nb_ennemis_vivants = 0
-					while(index < equipe_ennemis.len):
-						if(equipe_ennemis.membres[index].pv_actuels > 0):
-							nb_ennemis_vivants += 1
-						else:
-							index_targeted_personnage += 1
-						index += 1
+				if (event.type == KEYDOWN or (event.type == KEYUP and event.key == K_RETURN)):
+					if(index_targeted_personnage == 3):
+						print('Erreur majeure 1\n')
+						system.exit()
 
 					if(equipe_ennemis.len == 3):
 					# Si l'utilisateur appuie sur la flèche de droite
@@ -255,6 +270,9 @@ def graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 							else:
 								position_choice[0] = (dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
 								index_targeted_personnage = 0
+							if(index_targeted_personnage == 3):
+								print('Erreur majeure 2 \n')
+								system.exit()
 
 						elif(nb_ennemis_vivants == 3 and event.key == K_LEFT):
 							# On déplace la flèche de choix selon le choix de l'utilisateur
@@ -268,7 +286,9 @@ def graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 							else:
 								position_choice[0] = 3*(dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
 								index_targeted_personnage = 2
-						
+							if(index_targeted_personnage == 3):
+								print('Erreur majeure 3 \n')
+								system.exit()
 
 						elif(nb_ennemis_vivants == 2 and (event.key == K_LEFT or event.key == K_RIGHT)):
 							index_dead_monster = 0
@@ -285,6 +305,9 @@ def graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 								else:
 									position_choice[0] = (dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
 									index_targeted_personnage = 0
+								if(index_targeted_personnage == 3):
+									print('Erreur majeure 4\n')
+									system.exit()
 							
 							elif(index_dead_monster == 1):
 								if(position_choice[0] == (dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2):
@@ -296,6 +319,9 @@ def graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 								else:
 									position_choice[0] = (dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
 									index_targeted_personnage = 0
+								if(index_targeted_personnage == 3):
+									print('Erreur majeure 5\n')
+									system.exit()
 
 							elif(index_dead_monster == 0):
 								if(position_choice[0] == 2*(dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2):
@@ -307,6 +333,9 @@ def graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 								else:
 									position_choice[0] = 2*(dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
 									index_targeted_personnage = 1
+								if(index_targeted_personnage == 3):
+									print('Erreur majeure 6\n')
+									system.exit()
 
 
 						elif(nb_ennemis_vivants == 1 and (event.key == K_RIGHT or event.key == K_LEFT)):
@@ -315,6 +344,9 @@ def graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 								index_alive_monster += 1
 							position_choice[0] = (index_alive_monster + 1)*(dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
 							index_targeted_personnage = index_alive_monster
+							if(index_targeted_personnage == 3):
+								print('Erreur majeure 7\n')
+								system.exit()
 					
 					elif(equipe_ennemis.len == 2):
 						if(nb_ennemis_vivants == 2 and (event.key == K_LEFT or event.key == K_RIGHT)):
@@ -327,6 +359,9 @@ def graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 							else:
 								position_choice[0] = (dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
 								index_targeted_personnage = 0
+							if(index_targeted_personnage == 3):
+								print('Erreur majeure 8\n')
+								system.exit()
 
 						elif(nb_ennemis_vivants == 1 and (event.key == K_RIGHT or event.key == K_LEFT)):
 							index_alive_monster = 0
@@ -334,10 +369,16 @@ def graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 								index_alive_monster = 1
 							position_choice[0] = (1 + index_alive_monster)*(dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
 							index_targeted_personnage = index_alive_monster
+							if(index_targeted_personnage == 3):
+								print('Erreur majeure 9\n')
+								system.exit()
 					
 					elif(equipe_ennemis.len == 1):
 						position_choice[0] = (dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
 						index_targeted_personnage = 0
+						if(index_targeted_personnage == 3):
+							print('Erreur majeure 10\n')
+							system.exit()
 
 					# rechargement de la fenêtre
 					# indication[1] : le choix retenu,  indication[2] : la liste des messages

@@ -2079,6 +2079,7 @@ class Monstre:
                                     indice_cible=int(entree)
                                 '''
                                 indice_cible = graphism(fenetre,dimensions_fenetre,team_ennemis, [1,indice_capacite_choisie,liste_de_messages])
+                                # print('\n\n Indice cible : ',indice_cible,'\n\n')
 
                                 '''
                                 if(indice_cible == place_leader):
