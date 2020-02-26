@@ -177,50 +177,50 @@ class ForetVeur:
         monstre1=Champignon()
         while(monstre1.attribut!='Vent'):
             monstre1=Champignon()
-        monstre1.surnom='Champignon vert'
+        monstre1.surnom='Abeille de gauche'
 
         monstre2=Champignon()
         while(monstre2.attribut!='Feu'):
             monstre2=Champignon()
-        monstre2.surnom='Champignon rouge'
+        monstre2.surnom='Abeille de droite'
 
         demi_boss1=Champignon()
         while(demi_boss1.attribut!='Vent'):
             demi_boss1=Champignon()
         Monstre.evoluer(demi_boss1)
-        demi_boss1.surnom='Gros champignon vert'
+        demi_boss1.surnom='Abeille du centre'
 
         monstre3=Champignon()
         while(monstre3.attribut!='Feu'):
             monstre3=Champignon()
-        monstre3.surnom='Champignon rouge'
+        monstre3.surnom='Abeille de gauche'
 
         monstre4=Champignon()
         while(monstre4.attribut!='Eau'):
             monstre4=Champignon()
-        monstre4.surnom='Champignon bleu'
+        monstre4.surnom='Abeille de droite'
 
         demi_boss2=Champignon()
         while(demi_boss2.attribut!='Eau'):
             demi_boss2=Champignon()
         Monstre.evoluer(demi_boss2)
-        demi_boss2.surnom='Gros champignon bleu'
+        demi_boss2.surnom='Abeille du centre'
 
         monstre5=Champignon()
         while(monstre5.attribut!='Vent'):
             monstre5=Champignon()
-        monstre5.surnom='Champignon vert'
+        monstre5.surnom='Abeille de gauche'
 
         monstre6=Champignon()
         while(monstre6.attribut!='Feu'):
             monstre6=Champignon()
-        monstre6.surnom='Champignon rouge'
+        monstre6.surnom='Abeille de droite'
 
         boss=Sanglier()
         while(boss.attribut!='Feu'):
             boss=Sanglier()
         Monstre.evoluer(boss)
-        boss.surnom='Sanglier rouge géant'
+        boss.surnom='Orc du centre'
 
         XP_recompense=800
         recompense=[XP_recompense,ForetVeur.recompenses(niveau)]
@@ -595,7 +595,7 @@ class ForetVeur:
         boss.etat_cap2='dispo'
         boss.vitesse_max_donjons=2*boss.vitesse_max_donjons
         boss.vitesse=2*boss.vitesse
-        boss.vitesse_actuelle=boss.vitesse_max_donjons
+        boss.vitesse_actuelle=boss.vitesse # mieux pour l'affichage
         XP_recompense=812
         recompense=[XP_recompense,ForetVeur.recompenses(niveau)]
         caracteristiques=[nom,niveau,attribut,monstre1,monstre2,monstre3,monstre4,monstre5,monstre6,demi_boss1,demi_boss2,boss,recompense,nom_famille]
@@ -1182,7 +1182,7 @@ class MontTagne:
         boss.surnom='Golem rouge Royal'
         boss.defense_max_donjons=2*boss.defense_max_donjons
         boss.defense=2*boss.defense
-        boss.defense_actuelle=boss.defense_max_donjons
+        boss.defense_actuelle=boss.defense
         boss.pv_max_donjons=2*boss.pv_max_donjons
         boss.pv=2*boss.pv
         boss.pv_actuels=2*boss.pv_actuels
@@ -1809,6 +1809,9 @@ class CratereAter():
         boss.defense_max_donjons=2*boss.defense_max_donjons
         boss.defense=2*boss.defense
         boss.defense_actuelle=boss.defense
+        boss.pv_max_donjons=2*boss.pv_max_donjons
+        boss.pv=2*boss.pv
+        boss.pv_actuels=2*boss.pv_actuels
         XP_recompense=827
         recompense=[XP_recompense,CratereAter.recompenses(niveau)]
         caracteristiques=[nom,niveau,attribut,monstre1,monstre2,monstre3,monstre4,monstre5,monstre6,demi_boss1,demi_boss2,boss,recompense,nom_famille]

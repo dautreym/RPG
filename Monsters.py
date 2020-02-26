@@ -596,6 +596,7 @@ class Monstre:
                 self.bonus_de_runes[index]-=rune_supprimee.gains[index]
 
         self.bonus_famille_de_runes()
+        self.actualiser_stats_de_simples_a_listes()
 
         '''
         monstre_choisi.pv+=Arrondir.a_l_unite(monstre_choisi.bonus_de_runes_en_pv+monstre_choisi.pv*monstre_choisi.bonus_de_runes_en_pourcentage_de_pv)
@@ -1512,6 +1513,7 @@ class Monstre:
         self.actualiser_stats_de_simples_a_listes()
         self.bonus_famille_de_runes()
         ''' Actualise le gain en pourcentage de pv des runes et les applique '''
+        self.actualiser_stats_de_simples_a_listes()
         print(self)
 
 
@@ -1585,6 +1587,7 @@ class Monstre:
 
         self.actualiser_stats_de_simples_a_listes()
         self.bonus_famille_de_runes()
+        self.actualiser_stats_de_simples_a_listes()
 
 
 
@@ -1623,20 +1626,31 @@ class Monstre:
             pv_min=self.pv_min_6
             attaque_min=self.attaque_min_6
             defense_min=self.defense_min_6
-        self.pv=pv_min
-        self.attaque=attaque_min
-        self.defense=defense_min
+
+        self.pv = pv_min
+        self.pv_actuels = pv_min
+        self.pv_max_donjons = pv_min
+
+        self.attaque = attaque_min
+        self.attaque_actuelle = attaque_min
+        self.attaque_max_donjons = attaque_min
+
+        self.defense = defense_min
+        self.defense_actuelle = defense_min
+        self.defense_max_donjons = defense_min
 
         self.niveau=1
         self.classe+=1
         self.XP_avant_prochain_niveau=self.trouver_XP_initiale()
                 
+        self.actualiser_stats_de_simples_a_listes()
+
         for index in range(6):
             if(equipement[index] != 0):
                 equipement[index].equiper_sans_affichage(self,index)
         
         self.bonus_famille_de_runes()
-        
+
         self.bonus_de_runes_en_pv+=Arrondir.a_l_unite(self.pv*self.bonus_de_runes_en_pourcentage_de_pv)
         self.bonus_de_runes_en_attaque+=Arrondir.a_l_unite(self.attaque*self.bonus_de_runes_en_pourcentage_de_attaque)
         self.bonus_de_runes_en_defense+=Arrondir.a_l_unite(self.defense*self.bonus_de_runes_en_pourcentage_de_defense)
@@ -1650,7 +1664,8 @@ class Monstre:
         self.resistance_actuelle=self.resistance
         self.precision_actuelle=self.precision
     
-        self.actualiser_stats_de_simples_a_listes()        
+        self.actualiser_stats_de_simples_a_listes()
+
 
 
 
@@ -2065,13 +2080,17 @@ class Monstre:
                                 '''
                                 indice_cible = graphism(fenetre,dimensions_fenetre,team_ennemis, [1,indice_capacite_choisie,liste_de_messages])
 
+                                '''
                                 if(indice_cible == place_leader):
                                     cible=team_ennemis.membres[0]
                                 elif(indice_cible == place_membre_1):
                                     cible=team_ennemis.membres[1]
                                 elif(indice_cible == place_membre_2):
                                     cible=team_ennemis.membres[2]
-                                
+                                '''
+                                cible = team_ennemis.membres[indice_cible]
+
+
                                 pv_avant_degats=cible.pv_actuels
                                 if ((capacite_choisie not in capacites_soin_allie_avec_hit) and (capacite_choisie not in capacites_attaque_en_groupe) and (capacite_choisie not in capacites_hit_multicibles)):
                                     capacite_choisie(self,cible)
@@ -2888,28 +2907,51 @@ class Monstre:
             liste_de_messages.append("Capacité 1 : " + self.capacite1_nom)
             # print(self.capacite1_nom,' = 1')
             possibilites_capacite_speciale.append(1)
+        else:
+            liste_de_messages.append(" ")
         if(self.silencieux <= 0):
             if(self.nb_capacites >= 2):
                 if (self.etat_cap2 == 'dispo'):
                     liste_de_messages.append("Capacité 2 : " + self.capacite2_nom)
                     # print(self.capacite2_nom,' = 2')
                     possibilites_capacite_speciale.append(2)
+                else:
+                    liste_de_messages.append(" ")
             if(self.nb_capacites >= 3):
                 if (self.etat_cap3 == 'dispo'):
                     liste_de_messages.append("Capacité 3 : " + self.capacite3_nom)
                     # print(self.capacite3_nom,' = 3')
                     possibilites_capacite_speciale.append(3)
+                else:
+                    liste_de_messages.append(" ")
             if(self.nb_capacites >= 4):
                 if (self.etat_cap4 == 'dispo'):
                     liste_de_messages.append("Capacité 4 : " + self.capacite4_nom)
                     # print(self.capacite4_nom,' = 4')
                     possibilites_capacite_speciale.append(4)
+                else:
+                    liste_de_messages.append(" ")
         
         liste_de_messages.append('***** Recapitulatif *****')
+        
+        # Supprimer de ici 
+        noms_capacites_speciales = ['***** Récapitulatif *****']
+        noms_capacites_speciales.append("Capacité 1 : " + self.capacite1_nom)
+        if(self.nb_capacites >= 2):
+            noms_capacites_speciales.append("Capacité 2 : " + self.capacite2_nom)
+        if(self.nb_capacites >= 3):
+            noms_capacites_speciales.append("Capacité 3 : " + self.capacite3_nom)
+        if(self.nb_capacites >= 4):
+            noms_capacites_speciales.append("Capacité 4 : " + self.capacite4_nom)
+        # A là + dans le for ci-dessous 
+
         for index in range(team_allies.len):
-            liste_de_messages.append(team_allies.membres[index].surnom + " " + team_allies.membres[index].attribut  + " : " + str(team_allies.membres[index].pv_actuels) + " PV")
+            liste_de_messages.append(team_allies.membres[index].surnom + " " + team_allies.membres[index].attribut  + " : " + str(team_allies.membres[index].pv_actuels) + " PV sur " + str(team_allies.membres[index].pv_max_donjons))
             liste_de_messages.append('Jauge d\'attaque : ' + str(team_allies.membres[index].jauge_attaque))
+            noms_capacites_speciales.append(team_allies.membres[index].surnom + " " + team_allies.membres[index].attribut  + " : " + str(team_allies.membres[index].pv_actuels) + " PV sur " + str(team_allies.membres[index].pv_max_donjons))
+            noms_capacites_speciales.append('Jauge d\'attaque : ' + str(team_allies.membres[index].jauge_attaque))
         liste_de_messages.append('*************************')
+        noms_capacites_speciales.append('*************************')
         graphism_simple(fenetre,dimensions_fenetre,team_ennemis,[616,liste_de_messages])
         choix = graphism_simple(fenetre,dimensions_fenetre,team_ennemis,[617,liste_de_messages,possibilites_capacite_speciale])
 
@@ -5791,7 +5833,7 @@ class Lutin(Monstre):
             self.attente1=0
             self.etat_cap1='dispo'
 
-            self.capacite2=Lutin.Ignition
+            self.capacite2=Lutin.ignition
             self.capacite2_nom='Ignition'
             self.capacite2BonusSkill=0
             self.temps_recharge2=3
@@ -7662,7 +7704,7 @@ class Harpie(Monstre):
 
             self.nb_capacites=2
 
-            self.capacite1=Harpie.Kick
+            self.capacite1=Harpie.kick
             self.capacite1_nom='Double Kick'
             self.capacite1BonusSkill=0
             self.temps_recharge1=1
@@ -7870,14 +7912,14 @@ class Salamandre(Monstre):
             self.attente1=0
             self.etat_cap1='dispo'
 
-            self.capacite2=Salamandre.Ecrasement
+            self.capacite2=Salamandre.ecrasement
             self.capacite2_nom='Ecrasement'
             self.capacite2BonusSkill=0
             self.temps_recharge2=3
             self.attente2=0
             self.etat_cap2='dispo'
 
-            self.capacite3=Salamandre.Tremblement
+            self.capacite3=Salamandre.tremblement
             self.capacite3_nom='Tremblement de Terre'
             self.capacite3BonusSkill=0
             self.temps_recharge3=6
@@ -10901,7 +10943,7 @@ class Serpent(Monstre):
             self.attente1=0
             self.etat_cap1='dispo'
 
-            self.capacite2=Serpent.seflagration
+            self.capacite2=Serpent.deflagration
             self.capacite2_nom='Déflagration'
             self.capacite2_bonus_skill=0
             self.temps_recharge2=3
@@ -14461,7 +14503,7 @@ class ChevalierMagique(Monstre):
         print('\n',self.surnom,self.attribut,' tire des balles magiques sur ',cible.surnom,cible.attribut,'!!\n')
         for index in range(3):
             degats=self.calcul_dommages(2.1,self.capacite2_bonus_skill,cible)
-            self.affichage_du_type_de_coup(self,2.1,self.capacite2_bonus_skill,degats,cible)
+            self.affichage_du_type_de_coup(2.1,self.capacite2_bonus_skill,degats,cible)
             if(self.attribut=='Feu' and cible.pv_actuels > self.pv_actuels):
                 degats+=Arrondir.a_l_unite(0.5*degats)
             degats=cible.reduction_dommages(degats)

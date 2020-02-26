@@ -78,17 +78,17 @@ def initialisation_background(fenetre):
 	return background
 
 
-#position_cerbere = cerbere.get_rect()
-#position_cerbere2 = cerbere2.get_rect()
-#position_cerbere3 = cerbere3.get_rect()
+def trouver_image_monstre(nom_monstre,nom_niveau_donjon):
+	if('Forêt Veur' in nom_niveau_donjon):
+		nom_donjon='ForetVeur'
+	nom_image = "Graphism/Monstres_RPG_Maker/" + nom_donjon + "/" + nom_monstre + ".png"
+	image = pygame.image.load(nom_image).convert_alpha()
+	return image
 
-# Chargement et collage du personnage
-# (_alpha pour garder la zone transparente autour du personnage telle quelle)
 
 # ATTENTION
 # Suite à la fusion des deux fenêtres en une seule, il faut diviser par deux dimensions_fenetre[0]
 
-# A REFAIRE POUR TROIS ENNEMIS POUR POUVOIR GENERALISER 
 def initialisation_monstres(fenetre,dimensions_fenetre,equipe_ennemis,region):
 	police = pygame.font.SysFont("impact", 23)
 	
@@ -99,18 +99,24 @@ def initialisation_monstres(fenetre,dimensions_fenetre,equipe_ennemis,region):
 	images_persos=[]
 	positions_persos=[]
 	for index in range(equipe_ennemis.len):
-		if(equipe_ennemis.nom_niveau_donjon == 'la Forêt Veur Niveau 1 - Entrée '):
+		if('Forêt Veur' in equipe_ennemis.nom_niveau_donjon):
+		# if(equipe_ennemis.nom_niveau_donjon == 'la Forêt Veur Niveau 1 - Entrée '):
 			if(equipe_ennemis.membres[index].pv_actuels > 0):
-				perso_tmp = pygame.image.load("Graphism/Monstres_RPG_Maker/Orc.png").convert_alpha()
+				perso_tmp = trouver_image_monstre(equipe_ennemis.membres[index].nom, equipe_ennemis.nom_niveau_donjon)
+				# pygame.image.load("Graphism/Monstres_RPG_Maker/Orc.png").convert_alpha()
 				images_persos.append(perso_tmp)
 
-				if(equipe_ennemis.len == 2):
-					position_x_perso_tmp = ((1+index)*dimensions_fenetre[0] /3)/2
-				elif(equipe_ennemis.len == 3):
-					position_x_perso_tmp = ((1+index)*dimensions_fenetre[0] /4)/2
+				position_x_perso_tmp = ((1+index)*dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
 				position_y_perso_tmp = 200
-				positions_persos.append([position_x_perso_tmp,position_y_perso_tmp])
 
+				if(equipe_ennemis.membres[index].nom == 'Gardien de la Forêt'):
+					# Largeur : 360 pixels ; Hauteur : 276 pixels 
+					position_y_perso_tmp = 100
+					position_x_perso_tmp = (360+160)*index / equipe_ennemis.len
+				if(equipe_ennemis.membres[index].nom == 'Plante Carnivore'):
+					position_x_perso_tmp = 100 + (190 + 360)*index / equipe_ennemis.len
+
+				positions_persos.append([position_x_perso_tmp,position_y_perso_tmp])
 				fenetre.blit(perso_tmp, [position_x_perso_tmp,position_y_perso_tmp])
 
 				message = equipe_ennemis.membres[index].surnom + " " + equipe_ennemis.membres[index].attribut + " : " + str(equipe_ennemis.membres[index].pv_actuels) + " PV"
@@ -122,6 +128,9 @@ def initialisation_monstres(fenetre,dimensions_fenetre,equipe_ennemis,region):
 
 				# FORMULE A RECALCULER POUR UN MEILLEUR AFFICHAGE 
 				position_y_message = position_y_perso_tmp + 200 - 15*(index%2)
+				if(equipe_ennemis.membres[index].nom == 'Gardien de la Forêt'):
+					position_y_message = position_y_perso_tmp + 300 - 15*(index%2)
+
 				fenetre.blit(message,(position_x_perso_tmp,position_y_message))
 				fenetre.blit(message_2,(position_x_perso_tmp,position_y_message + 50))
 	
@@ -205,10 +214,11 @@ def graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 	# 	...
 
 	elif(indication[0] == 1):
-		position_choice = [(dimensions_fenetre[0] /3)/2, 130]
+		position_choice = [(dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2, 130]
 		index = 0
 		while(index < equipe_ennemis.len and equipe_ennemis.membres[index].pv_actuels <= 0):
-			position_choice[0] += (dimensions_fenetre[0]/3)/2
+			# Pour chaque ennemi mort, on décale la flèche vers la droite
+			position_choice[0] += (dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
 			index += 1
 		
 		initialisation_choice(fenetre,position_choice,police)
@@ -224,48 +234,117 @@ def graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 				if event.type == KEYDOWN:
 					index = 0
 					nb_ennemis_vivants = 0
-					while(index < equipe_ennemis.len and equipe_ennemis.membres[index].pv_actuels > 0):
-						nb_ennemis_vivants += 1
+					while(index < equipe_ennemis.len):
+						if(equipe_ennemis.membres[index].pv_actuels > 0):
+							nb_ennemis_vivants += 1
+						else:
+							index_targeted_personnage += 1
 						index += 1
 
+					if(equipe_ennemis.len == 3):
 					# Si l'utilisateur appuie sur la flèche de droite
-					if (event.key == K_RIGHT and nb_ennemis_vivants > 1):
-						if(nb_ennemis_vivants > 1):
+						if (nb_ennemis_vivants == 3 and event.key == K_RIGHT):
 							# On déplace la flèche de choix selon le choix de l'utilisateur
-							if (position_choice[0] == (dimensions_fenetre[0] /3)/2):
-								position_choice[0] = 2*(dimensions_fenetre[0] /3)/2
-								index_targeted_personnage = 1
-							else:
-								position_choice[0] = (dimensions_fenetre[0] /3)/2
+							position_choice[0] += (dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
+							if (position_choice[0] == (dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2):
 								index_targeted_personnage = 0
-							# rechargement de la fenêtre 
-							'''
-							message = "C'est au tour de " + self.surnom + " " + self.attribut + " : "
-							graphism(fenetre,dimensions_fenetre,equipe_ennemis,[618,[message]])
-							En commentaire car self non défini ...
-							'''
-							# indication[1] : le choix retenu,  indication[2] : la liste des messages
-							graphism_simple(fenetre,dimensions_fenetre,equipe_ennemis,[616,indication[2]])
-							initialisation_print(fenetre, police, indication[2], [617,right_arrow,indication[1]])
+							elif (position_choice[0] == 2*(dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2 and equipe_ennemis.len > 1):
+								index_targeted_personnage = 1
+							elif (position_choice[0] == 3*(dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2 and equipe_ennemis.len > 1):
+								index_targeted_personnage = 2
+							else:
+								position_choice[0] = (dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
+								index_targeted_personnage = 0
 
-					# Si l'utilisateur appuie sur la flèche de gauche
-					if (event.key == K_LEFT and nb_ennemis_vivants > 1):
-                    	# On déplace la flèche de choix selon le choix de l'utilisateur
-						if (position_choice[0] == (dimensions_fenetre[0] /3)/2):
-							position_choice[0] = 2*(dimensions_fenetre[0] /3)/2
-							index_targeted_personnage = 1
-						else:
-							position_choice[0] = (dimensions_fenetre[0] /3)/2
-							index_targeted_personnage = 0
-						# rechargement de la fenêtre 
-						'''
-						message = "C'est au tour de " + self.surnom + " " + self.attribut + " : "
-						graphism(fenetre,dimensions_fenetre,equipe_ennemis,[618,[message]])
-						En commentaires car self non défini...
-						'''
-						# indication[1] : le choix retenu,  indication[2] : la liste des messages
-						graphism_simple(fenetre,dimensions_fenetre,equipe_ennemis,[616,indication[2]])
-						initialisation_print(fenetre, police, indication[2], [617,right_arrow,indication[1]]) 
+						elif(nb_ennemis_vivants == 3 and event.key == K_LEFT):
+							# On déplace la flèche de choix selon le choix de l'utilisateur
+							position_choice[0] -= (dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
+							if (position_choice[0] == (dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2):
+								index_targeted_personnage = 0
+							elif (position_choice[0] == 2*(dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2 and equipe_ennemis.len > 1):
+								index_targeted_personnage = 1
+							elif (position_choice[0] == 3*(dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2 and equipe_ennemis.len > 1):
+								index_targeted_personnage = 2
+							else:
+								position_choice[0] = 3*(dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
+								index_targeted_personnage = 2
+						
+
+						elif(nb_ennemis_vivants == 2 and (event.key == K_LEFT or event.key == K_RIGHT)):
+							index_dead_monster = 0
+							while(index_dead_monster < equipe_ennemis.len and equipe_ennemis.membres[index_dead_monster].pv_actuels > 0):
+								index_dead_monster += 1
+
+							if(index_dead_monster == 2):
+								if (position_choice[0] == (dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2):
+									position_choice[0] = 2*(dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
+									index_targeted_personnage = 1
+								elif(position_choice[0] == 2*(dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2):
+									position_choice[0] = (dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
+									index_targeted_personnage = 0
+								else:
+									position_choice[0] = (dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
+									index_targeted_personnage = 0
+							
+							elif(index_dead_monster == 1):
+								if(position_choice[0] == (dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2):
+									position_choice[0] = 3*(dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
+									index_targeted_personnage = 2
+								elif(position_choice[0] == 3*(dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2):
+									position_choice[0] = (dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
+									index_targeted_personnage = 0
+								else:
+									position_choice[0] = (dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
+									index_targeted_personnage = 0
+
+							elif(index_dead_monster == 0):
+								if(position_choice[0] == 2*(dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2):
+									position_choice[0] = 3*(dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
+									index_targeted_personnage = 2
+								elif(position_choice[0] == 3*(dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2):
+									position_choice[0] = 2*(dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
+									index_targeted_personnage = 1
+								else:
+									position_choice[0] = 2*(dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
+									index_targeted_personnage = 1
+
+
+						elif(nb_ennemis_vivants == 1 and (event.key == K_RIGHT or event.key == K_LEFT)):
+							index_alive_monster = 0
+							while(index_alive_monster < equipe_ennemis.len and equipe_ennemis.membres[index_alive_monster].pv_actuels <= 0):
+								index_alive_monster += 1
+							position_choice[0] = (index_alive_monster + 1)*(dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
+							index_targeted_personnage = index_alive_monster
+					
+					elif(equipe_ennemis.len == 2):
+						if(nb_ennemis_vivants == 2 and (event.key == K_LEFT or event.key == K_RIGHT)):
+							if(position_choice[0] == (dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2):
+								position_choice[0] = 2*(dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
+								index_targeted_personnage = 1
+							elif(position_choice[0] == 2*(dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2):
+								position_choice[0] = (dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
+								index_targeted_personnage = 0
+							else:
+								position_choice[0] = (dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
+								index_targeted_personnage = 0
+
+						elif(nb_ennemis_vivants == 1 and (event.key == K_RIGHT or event.key == K_LEFT)):
+							index_alive_monster = 0
+							if(equipe_ennemis.membres[index_alive_monster].pv_actuels <= 0):
+								index_alive_monster = 1
+							position_choice[0] = (1 + index_alive_monster)*(dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
+							index_targeted_personnage = index_alive_monster
+					
+					elif(equipe_ennemis.len == 1):
+						position_choice[0] = (dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
+						index_targeted_personnage = 0
+
+					# rechargement de la fenêtre
+					# indication[1] : le choix retenu,  indication[2] : la liste des messages
+					graphism_simple(fenetre,dimensions_fenetre,equipe_ennemis,[616,indication[2]])
+					initialisation_print(fenetre, police, indication[2], [617,right_arrow,indication[1]])
+
+			
 
 					if event.key == K_RETURN:
 						continuer = 0
@@ -280,11 +359,7 @@ def graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 					fond = initialisation_background(fenetre)
 					monstres = initialisation_monstres(fenetre,dimensions_fenetre,equipe_ennemis,1)
 					initialisation_choice(fenetre,position_choice,police)
-					'''
-					message = "C'est au tour de " + self.surnom + " " + self.attribut + " : "
-					graphism(fenetre,dimensions_fenetre,equipe_ennemis,[618,[message]])
-					En commentaires car self non défini...
-					'''
+					
 					# indication[1] : le choix retenu,  indication[2] : la liste des messages
 					graphism_simple(fenetre,dimensions_fenetre,equipe_ennemis,[616,indication[2]])
 					initialisation_print(fenetre, police, indication[2], [617,right_arrow,indication[1]])
@@ -292,7 +367,7 @@ def graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 					# Rafraichissement de l'écran
 					pygame.display.flip()
 
-		# Si le joueur quitte ou appuie sur la touche Entrée 
+		# Quand le joueur a validé son choix et que ce derneir est correct 
 		return index_targeted_personnage
 
 
@@ -327,6 +402,7 @@ def graphism_simple(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 		initialisation_print(fenetre, police, indication[1], [617,right_arrow,choix_capacite])
 
 		possibilites_capacite_speciale=indication[2]
+		# noms_capacites_speciales=indication[3]
 
 		while(choix_capacite not in possibilites_capacite_speciale or continuer == 1):
 			for event in pygame.event.get():
@@ -356,7 +432,7 @@ def graphism_simple(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 					if (event.key == K_RETURN or event.key == K_KP_ENTER):
 						choix_capacite = choix_capacite_tmp
 						if(choix_capacite not in possibilites_capacite_speciale):
-							print('\n Dommage!! Essaye encore!! \n')
+							print('\n Dommage!! Essaye encore!! \n (Capacité ', choix_capacite, ' donnée n\'appartient pas à la liste des possibilités ', possibilites_capacite_speciale,')\n')
 
 					
 				if event.type == KEYUP:

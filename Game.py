@@ -679,7 +679,7 @@ class Game:
                 possibilites_evolution=[]
                 index=1
                 while(index <= self.place_dernier_monstre):
-                    if((self.stockage[index].niveau_max_de_la_classe_atteint()) and (self.stockage[e].classe < 6)):
+                    if((self.stockage[index].niveau_max_de_la_classe_atteint()) and (self.stockage[index].classe < 6)):
                         print('Le monstre ',self.stockage[index].surnom,'de',self.stockage[index].attribut,self.stockage[index].classe,' étoiles niveau ',self.stockage[index].niveau,'à l\'emplacement ',index)
                         possibilites_evolution.append(index)
                     index+=1

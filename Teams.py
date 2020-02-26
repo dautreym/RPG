@@ -517,6 +517,8 @@ class Equipe:
                         if(ennemis.leader.pv_actuels<=0 and (ennemis.leader not in ennemis_morts)):
                             ennemis_morts.append(ennemis.leader)
                         '''
+
+                        # PAS DE COMPARAISON DES STATS DE VITESSSE POUR DECIDER WTF 
                         
                         jauge_max=persos[0].jauge_attaque
                         indice_du_max=0
