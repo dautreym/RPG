@@ -1968,8 +1968,6 @@ class Monstre:
             if(reussite_effet <= self.chances_tour_supplementaire):
                 self.tour_supplementaire_tmp+=1
 
-        # La fonction graphism sera utilisée pour la partie gauche de la fenêtre
-        # La fonction graphism_simple sera utilisée pour la partie droite de la fenêtre 
         dimensions_fenetre = [2*617,480]
         fenetre = initialisation_fenetre(dimensions_fenetre)
 
@@ -2953,8 +2951,8 @@ class Monstre:
             noms_capacites_speciales.append('Jauge d\'attaque : ' + str(team_allies.membres[index].jauge_attaque))
         liste_de_messages.append('*************************')
         noms_capacites_speciales.append('*************************')
-        graphism_simple(fenetre,dimensions_fenetre,team_ennemis,[616,liste_de_messages])
-        choix = graphism_simple(fenetre,dimensions_fenetre,team_ennemis,[617,liste_de_messages,possibilites_capacite_speciale])
+        graphism(fenetre,dimensions_fenetre,team_ennemis,[616,liste_de_messages])
+        indice_capacite_choisie = graphism(fenetre,dimensions_fenetre,team_ennemis,[617,liste_de_messages,possibilites_capacite_speciale])
 
         '''
         entree=input('Quelle capacité voulez-vous utiliser ? ')
@@ -2968,24 +2966,24 @@ class Monstre:
             choix=int(entree)
         '''
 
-        if (choix == 1):
+        if (indice_capacite_choisie == 1):
             capacite_choisie=self.capacite1
             self.attente1=self.temps_recharge1
             self.etat_cap1='Non dispo'
-        elif (choix == 2):
+        elif (indice_capacite_choisie == 2):
             capacite_choisie=self.capacite2
             self.attente2=self.temps_recharge2
             self.etat_cap2='Non dispo'
-        elif (choix == 3):
+        elif (indice_capacite_choisie == 3):
             capacite_choisie=self.capacite3
             self.attente3=self.temps_recharge3
             self.etat_cap3='Non dispo'
-        elif (choix == 4):
+        elif (indice_capacite_choisie == 4):
             capacite_choisie=self.capacite4
             self.attente4=self.temps_recharge4
             self.etat_cap4='Non dispo'
         
-        return [capacite_choisie, choix, liste_de_messages]
+        return [capacite_choisie, indice_capacite_choisie, liste_de_messages]
 
 
 

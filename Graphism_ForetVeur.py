@@ -83,6 +83,10 @@ def trouver_image_monstre(nom_monstre,nom_niveau_donjon):
 		nom_donjon='ForetVeur'
 	nom_image = "Graphism/Monstres_RPG_Maker/" + nom_donjon + "/" + nom_monstre + ".png"
 	image = pygame.image.load(nom_image).convert_alpha()
+	if(nom_monstre == 'Gardien de la Forêt'):
+		image = pygame.image.load("Graphism/Monstres_RPG_Maker/ForetVeur/Gardien.png").convert_alpha()
+	if(nom_monstre == 'Plante Carnivore'):
+		image = pygame.image.load("Graphism/Monstres_RPG_Maker/ForetVeur/Plante.png").convert_alpha()
 	return image
 
 
@@ -98,15 +102,18 @@ def initialisation_monstres(fenetre,dimensions_fenetre,equipe_ennemis,region):
 
 	images_persos=[]
 	positions_persos=[]
+	barres_de_vie=[0,0,0]
+	barres_de_attaque=[0,0,0]
+	
 	for index in range(equipe_ennemis.len):
 		if('Forêt Veur' in equipe_ennemis.nom_niveau_donjon):
 		# if(equipe_ennemis.nom_niveau_donjon == 'la Forêt Veur Niveau 1 - Entrée '):
 			if(equipe_ennemis.membres[index].pv_actuels > 0):
 				perso_tmp = trouver_image_monstre(equipe_ennemis.membres[index].nom, equipe_ennemis.nom_niveau_donjon)
-				# pygame.image.load("Graphism/Monstres_RPG_Maker/Orc.png").convert_alpha()
+				# pygame.image.load("Graphism/Monstres_RPG_Maker/Orc.png").convert_alpha() par exemple 
 				images_persos.append(perso_tmp)
 
-				position_x_perso_tmp = ((1+index)*dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
+				position_x_perso_tmp = ((1+index)*dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2 - 30
 				position_y_perso_tmp = 200
 
 				if(equipe_ennemis.membres[index].nom == 'Gardien de la Forêt'):
@@ -119,6 +126,8 @@ def initialisation_monstres(fenetre,dimensions_fenetre,equipe_ennemis,region):
 				positions_persos.append([position_x_perso_tmp,position_y_perso_tmp])
 				fenetre.blit(perso_tmp, [position_x_perso_tmp,position_y_perso_tmp])
 
+				'''
+				AVANT
 				message = equipe_ennemis.membres[index].surnom + " " + equipe_ennemis.membres[index].attribut + " : " + str(equipe_ennemis.membres[index].pv_actuels) + " PV"
 				#  sur " + str(equipe_ennemis.membres[index].pv_max_donjons)
 				message_2 = "Jauge d'attaque : " + str(equipe_ennemis.membres[index].jauge_attaque)
@@ -133,18 +142,62 @@ def initialisation_monstres(fenetre,dimensions_fenetre,equipe_ennemis,region):
 
 				fenetre.blit(message,(position_x_perso_tmp,position_y_message))
 				fenetre.blit(message_2,(position_x_perso_tmp,position_y_message + 50))
-	
-	
+				'''
+				# Maintenant :
+				barres_de_vie[index] = pygame.image.load("Graphism/trop_des_barres/barre_vie.png").convert_alpha()
+				barres_de_attaque[index] = pygame.image.load("Graphism/trop_des_barres/barre_attaque.png").convert_alpha()
 
+				jauge_de_vie = pygame.image.load("Graphism/trop_des_barres/jauge_vie.png").convert_alpha()
+				jauge_de_attaque = pygame.image.load("Graphism/trop_des_barres/jauge_attaque.png").convert_alpha()
+				jauge_de_vie_actuelle = pygame.transform.scale(jauge_de_vie, (10,100))
+				jauge_de_attaque_actuelle = pygame.transform.scale(jauge_de_attaque, (10,100))
+
+				position_y_barre_de_vie = position_y_perso_tmp - 100 - 15*(index%2)
+				if(equipe_ennemis.membres[index].nom == 'Gardien de la Forêt'):
+					position_y_barre_de_vie = position_y_perso_tmp - 150 - 15*(index%2)
+					
+				fenetre.blit(barres_de_vie[index], (position_x_perso_tmp - 15,position_y_barre_de_vie))
+				fenetre.blit(barres_de_attaque[index], (position_x_perso_tmp - 15,position_y_barre_de_vie + 30))
+
+				nb_affichages_vie = int(20*(equipe_ennemis.membres[index].pv_actuels / equipe_ennemis.membres[index].pv_max_donjons))
+				# print("\n\n",equipe_ennemis.membres[index].pv_actuels," / ",equipe_ennemis.membres[index].pv_max_donjons," multiplié par 100 divisé par 5 = ",nb_affichages_vie,"\n\n")
+				if(nb_affichages_vie == 0 and equipe_ennemis.membres[index].pv_actuels > 0):
+					nb_affichages_vie = 1
+				
+				nb_affichages_attaque = equipe_ennemis.membres[index].jauge_attaque // 5
+				
+				for index in range(nb_affichages_vie):
+					fenetre.blit(jauge_de_vie_actuelle, (position_x_perso_tmp + 50 +5*index,position_y_barre_de_vie))
+				for index in range(nb_affichages_attaque):
+					fenetre.blit(jauge_de_attaque_actuelle, (position_x_perso_tmp + 50 +5*index,position_y_barre_de_vie + 30))
+	
 	# Rafraîchissement de l'écran
 	pygame.display.flip()
 
 	return [images_persos,positions_persos]
 
 
-def initialisation_choice(fenetre,position_choice,police):
-	choice = pygame.image.load("Graphism/arrow_reduced.png").convert_alpha()
-	fenetre.blit(choice, position_choice)
+# On est obligé de transmettre une clé pour enregistrer le relâchement d'une touche
+# Si la touche relâchée est un déplacmeent latéral, on actualise la position en x
+def initialisation_choice(fenetre,position_choice,nom_monstre,police,key):
+	choice_huge = pygame.image.load("Graphism/viseur.png").convert_alpha()
+	choice = pygame.transform.scale(choice_huge, (80,80))
+	#choice = choice_huge
+
+	real_position_choice = [0,0]
+	real_position_choice[0] = position_choice[0]
+	real_position_choice[1] = position_choice[1]
+	# Si c'est une abeille (oui... je me déprime :'(  )
+	if(nom_monstre == 'Champignon'):
+		if(key == K_LEFT or key == K_RIGHT):
+		#	print("\n\n OUIIIIIIIIII : ",key," == K_LEFT or K_RIGHT \n\n")
+			real_position_choice[0] -= 30
+		#else:
+		#	print("\n\n KEY = ",key," != K_LEFT or K_RIGHT \n\n")
+		if(real_position_choice[1] > 225):
+			real_position_choice[1] -= 30
+		#print("\n\n Position choice : ",position_choice,"\n\n Real position choice : ",real_position_choice,"\n\n")
+	fenetre.blit(choice, real_position_choice)
 
 	message = police.render("Quel monstre voulez-vous attaquer ? ", 1, (255,0,0))
 	fenetre.blit(message, (30, 50)) 
@@ -192,6 +245,12 @@ def graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 	police = pygame.font.SysFont("arial", 16)
 	right_arrow = pygame.image.load("Graphism/right_arrow.gif").convert_alpha()
 	
+	# Choix astucieux : 0 est le premier indice possible
+	# donc la flèche de choix sera positionnée en face du premier choix 
+	# ET 0 n'est dans aucune liste de possibilites_capacite_speciale :)
+	choix_capacite = 0
+	choix_capacite_tmp = 1
+
 	index_targeted_personnage = 0
 	index = 0
 	nb_ennemis_vivants = 0
@@ -213,13 +272,21 @@ def graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 	if(index_targeted_personnage == 3):
 		print('Erreur majeure 0\n')
 		system.exit()
-
+	
 	# Code pour indication : liste de deux éléments (un pour le type d'action, l'autre pour le contenu)
 	# Si indication[0] = 0 : afficher à gauche une liste de messages contenue dans indication[1]
 	# Si indication[0] = 616 : afficher à droite une liste de messages contenue dans indication[1]
 
 	# Si indication[0] = 1 : faire choisir une cible (indication[1] n'est pas évalué)
 		# Cohérent car le choix d'une cible se fait à gauche !!
+
+	# Si indication[0] = 617 : afficher une image à droite 
+		# POUR L'INSTANT seulement utilisé pour faire choisir une capacité
+			# Ici, on affiche donc right_arrow à droite comme image, en face de choix_capacite
+			# On affiche en même temps indication[1] (car indication[0] à 1 permet AUSSI d'afficher des messages)
+		# Si indication[0] = 617, on récupère la variable possibilites_capacite_speciale 
+			# dans indication[2] qui existera alors TOUJOURS si indication[0] = 617 
+
 
 	if(indication[0] == 0):
 		# Affichage d'un simple message sur la gauche 
@@ -229,19 +296,86 @@ def graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 		# Affichage d'un simple message sur la droite
 		initialisation_print(fenetre, police, indication[1], [indication[0]])
 
-	# NE SERT QUE DANS LE CAS Où APPELé DEPUIS GRAPHISM_SIMPLE !!!!
-	# elif(indication[0] == 617):
-	# 	...
+
+
+
+	if(indication[0] == 617):
+		# CHOIX D UNE CAPACITE SPECIALE  
+
+		initialisation_print(fenetre, police, indication[1], [617,right_arrow,choix_capacite])
+		possibilites_capacite_speciale=indication[2]
+		# noms_capacites_speciales=indication[3]
+		
+		continuer = 1
+		valider = 1
+		while(choix_capacite not in possibilites_capacite_speciale or (continuer == 1 or valider == 1)):
+			for event in pygame.event.get():
+				if event.type == KEYDOWN:
+					if event.key == K_DOWN:
+						choix_capacite_tmp += 1
+						if(choix_capacite_tmp > possibilites_capacite_speciale[len(possibilites_capacite_speciale)-1]):
+							choix_capacite_tmp -= possibilites_capacite_speciale[len(possibilites_capacite_speciale)-1]
+						
+						dimensions_fenetre = [2*617,480]
+						fenetre = initialisation_fenetre(dimensions_fenetre)
+						graphism(fenetre,dimensions_fenetre,equipe_ennemis,[616,indication[1]])
+						initialisation_print(fenetre, police, indication[1], [617,right_arrow,choix_capacite_tmp])
+					
+					if event.key == K_UP:
+						choix_capacite_tmp -= 1
+						if(choix_capacite_tmp == 0):
+							choix_capacite_tmp = possibilites_capacite_speciale[len(possibilites_capacite_speciale)-1]
+						
+						dimensions_fenetre = [2*617,480]
+						fenetre = initialisation_fenetre(dimensions_fenetre)
+						graphism(fenetre,dimensions_fenetre,equipe_ennemis,[616,indication[1]])
+						initialisation_print(fenetre, police, indication[1], [617,right_arrow,choix_capacite_tmp])
+
+					if (event.key == K_RETURN):
+						choix_capacite = choix_capacite_tmp
+						if(choix_capacite not in possibilites_capacite_speciale):
+							print('\n Dommage!! Essaye encore!! \n (Capacité ', choix_capacite, ' donnée n\'appartient pas à la liste des possibilités ', possibilites_capacite_speciale,')\n')
+						else:
+							continuer = 0
+					
+				if event.type == KEYUP:
+					if (event.key == K_RETURN or event.key == K_KP_ENTER):
+						valider = 0
+		
+		return choix_capacite
+
+
+
 
 	elif(indication[0] == 1):
-		position_choice = [(dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2, 130]
+		# CHOIX D UNE CIBLE 
+
+
+		position_choice = [(dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2, 250]
+		# Actualisation de la position de la flèche de choix
+		fenetre = initialisation_fenetre(dimensions_fenetre)
+		fond = initialisation_background(fenetre)
+		monstres = initialisation_monstres(fenetre,dimensions_fenetre,equipe_ennemis,1)
+
+		# indication[1] : le choix retenu,  indication[2] : la liste des messages
+		graphism(fenetre,dimensions_fenetre,equipe_ennemis,[616,indication[2]])
+		initialisation_print(fenetre, police, indication[2], [617,right_arrow,indication[1]])
+
+		'''
+		initialisation_choice(fenetre,position_choice,equipe_ennemis.membres[index_targeted_personnage].nom,police,K_LEFT)
+		# Rafraichissement de l'écran
+		pygame.display.flip()
+		'''
+
 		index = 0
 		while(index < equipe_ennemis.len and equipe_ennemis.membres[index].pv_actuels <= 0):
 			# Pour chaque ennemi mort, on décale la flèche vers la droite
 			position_choice[0] += (dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
 			index += 1
 		
-		initialisation_choice(fenetre,position_choice,police)
+		initialisation_choice(fenetre,position_choice,equipe_ennemis.membres[0].nom,police,K_LEFT)
+		# Rafraîchissement de l'écran
+		pygame.display.flip()
 
 		continuer = 1
 		valider = 1
@@ -251,12 +385,15 @@ def graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 				# Liste complète des possibilités à la place de K_RIGHT, LEFT, UP, DOWN :
 				# https://openclassrooms.com/fr/courses/1399541-interface-graphique-pygame-pour-python/1399995-gestion-des-evenements-1
 		
-				if (event.type == KEYDOWN or (event.type == KEYUP and event.key == K_RETURN)):
+				if (event.type == KEYDOWN):
 					if(index_targeted_personnage == 3):
 						print('Erreur majeure 1\n')
 						system.exit()
 
-					if(equipe_ennemis.len == 3):
+					if event.key == K_RETURN:
+						continuer = 0
+
+					elif(equipe_ennemis.len == 3):
 					# Si l'utilisateur appuie sur la flèche de droite
 						if (nb_ennemis_vivants == 3 and event.key == K_RIGHT):
 							# On déplace la flèche de choix selon le choix de l'utilisateur
@@ -380,113 +517,52 @@ def graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 							print('Erreur majeure 10\n')
 							system.exit()
 
-					# rechargement de la fenêtre
-					# indication[1] : le choix retenu,  indication[2] : la liste des messages
-					graphism_simple(fenetre,dimensions_fenetre,equipe_ennemis,[616,indication[2]])
-					initialisation_print(fenetre, police, indication[2], [617,right_arrow,indication[1]])
-
-			
-
-					if event.key == K_RETURN:
-						continuer = 0
-
-				if event.type == KEYUP:
-					if event.key == K_RETURN:
-						valider = 0
-
+					'''
+					LE RAFRAICHISSEMENT SE FAIT EN RELACHANT LA TOUCHE ENFONCEE 
 
 					# Actualisation de la position de la flèche de choix
 					fenetre = initialisation_fenetre(dimensions_fenetre)
 					fond = initialisation_background(fenetre)
 					monstres = initialisation_monstres(fenetre,dimensions_fenetre,equipe_ennemis,1)
-					initialisation_choice(fenetre,position_choice,police)
-					
+					initialisation_choice(fenetre,position_choice,equipe_ennemis.membres[index_targeted_personnage].nom,police, event.key)
+
 					# indication[1] : le choix retenu,  indication[2] : la liste des messages
-					graphism_simple(fenetre,dimensions_fenetre,equipe_ennemis,[616,indication[2]])
+					graphism(fenetre,dimensions_fenetre,equipe_ennemis,[616,indication[2]])
 					initialisation_print(fenetre, police, indication[2], [617,right_arrow,indication[1]])
 
 					# Rafraichissement de l'écran
 					pygame.display.flip()
+					'''
 
-		# Quand le joueur a validé son choix et que ce derneir est correct 
+				if event.type == KEYUP:
+					if event.key == K_RETURN:
+						valider = 0
+
+					# Actualisation de la position du viseur de choix
+					fenetre = initialisation_fenetre(dimensions_fenetre)
+					fond = initialisation_background(fenetre)
+					monstres = initialisation_monstres(fenetre,dimensions_fenetre,equipe_ennemis,1)
+				
+					# indication[1] : le choix retenu,  indication[2] : la liste des messages
+					graphism(fenetre,dimensions_fenetre,equipe_ennemis,[616,indication[2]])
+					initialisation_print(fenetre, police, indication[2], [617,right_arrow,indication[1]])
+
+					initialisation_choice(fenetre,position_choice,equipe_ennemis.membres[index_targeted_personnage].nom,police,event.key)
+					# Rafraîchissement de l'écran
+					pygame.display.flip()
+
+		# Quand le joueur a validé son choix et que ce dernier est correct 
 		return index_targeted_personnage
 
 
 
 
-# Simple dans le sens où il ne prend qu'un paramètre et pas d'équipe en paramètre...
-def graphism_simple(fenetre,dimensions_fenetre,equipe_ennemis,indication):
-	police = pygame.font.SysFont("arial", 16)
-
-	# Choix astucieux : 0 est le premier indice possible
-	# donc la flèche de choix sera positionnée en face du premeir choix 
-	# ET 0 n'est dans aucune liste de possibilites_capacite_speciale :)
-	choix_capacite = 0
-	choix_capacite_tmp = 1
-	continuer = 1
 
 
-	# Code pour indication : liste de deux éléments (un pour le type d'action, l'autre pour le contenu)
-	# Si indication[0] = 0 : afficher à gauche une liste de messages contenue dans indication[1]
-	# Si indication[0] = 616 : afficher à droite une liste de messages contenue dans indication[1]
 
-	# Si indication[0] = 617 : afficher une image à droite 
-		# Ici, on affiche right_arrow à droite comme image, en face de choix_capacite
-		# On affiche en même temps indication[1] (car indication[0] à 1 permet AUSSI d'afficher des messages)
 
-	# Si indication[0] = 617, on récupère la variable possibilites_capacite_speciale 
-	# dans indication[2] qui existera alors TOUJOURS si indication[0] = 617 
-	
-	right_arrow = pygame.image.load("Graphism/right_arrow.gif").convert_alpha()
 
-	if(indication[0] == 617):
-		initialisation_print(fenetre, police, indication[1], [617,right_arrow,choix_capacite])
 
-		possibilites_capacite_speciale=indication[2]
-		# noms_capacites_speciales=indication[3]
-
-		while(choix_capacite not in possibilites_capacite_speciale or continuer == 1):
-			for event in pygame.event.get():
-				if event.type == KEYDOWN:
-					if event.key == K_DOWN:
-						choix_capacite_tmp += 1
-						if(choix_capacite_tmp > possibilites_capacite_speciale[len(possibilites_capacite_speciale)-1]):
-							choix_capacite_tmp -= possibilites_capacite_speciale[len(possibilites_capacite_speciale)-1]
-						
-						dimensions_fenetre = [2*617,480]
-						fenetre = initialisation_fenetre(dimensions_fenetre)
-						graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication)
-						graphism_simple(fenetre,dimensions_fenetre,equipe_ennemis,[616,indication[1]])
-						initialisation_print(fenetre, police, indication[1], [617,right_arrow,choix_capacite_tmp])
-					
-					if event.key == K_UP:
-						choix_capacite_tmp -= 1
-						if(choix_capacite_tmp == 0):
-							choix_capacite_tmp = possibilites_capacite_speciale[len(possibilites_capacite_speciale)-1]
-						
-						dimensions_fenetre = [2*617,480]
-						fenetre = initialisation_fenetre(dimensions_fenetre)
-						graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication)
-						graphism_simple(fenetre,dimensions_fenetre,equipe_ennemis,[616,indication[1]])
-						initialisation_print(fenetre, police, indication[1], [617,right_arrow,choix_capacite_tmp])
-
-					if (event.key == K_RETURN or event.key == K_KP_ENTER):
-						choix_capacite = choix_capacite_tmp
-						if(choix_capacite not in possibilites_capacite_speciale):
-							print('\n Dommage!! Essaye encore!! \n (Capacité ', choix_capacite, ' donnée n\'appartient pas à la liste des possibilités ', possibilites_capacite_speciale,')\n')
-
-					
-				if event.type == KEYUP:
-					if (event.key == K_RETURN or event.key == K_KP_ENTER):
-						continuer = 0
-					
-	elif(indication[0] == 0):
-		initialisation_print(fenetre, police, indication[1], [0])
-
-	elif(indication[0] == 616):
-		initialisation_print(fenetre, police, indication[1], [616])
-
-	return choix_capacite
 
 
 
