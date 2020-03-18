@@ -237,46 +237,46 @@ class ForetVeur:
         monstre1=GardienForet()
         while(monstre1.attribut!='Feu'):
             monstre1=GardienForet()
-        monstre1.surnom='Gardien de Feu de la Forêt'
+        monstre1.surnom='Gardien de la Forêt'
 
         monstre2=GardienForet()
         while(monstre2.attribut!='Vent'):
             monstre2=GardienForet()
-        monstre2.surnom='Gardien de Vent de la Forêt'
+        monstre2.surnom='Gardien de la Forêt'
 
         demi_boss1=GardienForet()
         while(demi_boss1.attribut!='Vent'):
             demi_boss1=GardienForet()
         Monstre.evoluer(demi_boss1)
         Monstre.monter_en_niveau_sans_affichage(demi_boss1)
-        demi_boss1.surnom='Grand Gardien de Vent de la Forêt'
+        demi_boss1.surnom='Grand Gardien de la Forêt'
 
         monstre3=GardienForet()
         while(monstre3.attribut!='Feu'):
             monstre3=GardienForet()
-        monstre3.surnom='Gardien de Feu de la Forêt'
+        monstre3.surnom='Gardien de la Forêt'
 
         monstre4=GardienForet()
         while(monstre4.attribut!='Eau'):
             monstre4=GardienForet()
-        monstre4.surnom='Gardien d\'Eau de la Forêt'
+        monstre4.surnom='Gardien de la Forêt'
 
         demi_boss2=GardienForet()
         while(demi_boss2.attribut!='Eau'):
             demi_boss2=GardienForet()
         Monstre.evoluer(demi_boss2)
         Monstre.monter_en_niveau_sans_affichage(demi_boss2)
-        demi_boss2.surnom='Grand Gardien de l\'Eau de la Forêt'
+        demi_boss2.surnom='Grand Gardien de la Forêt'
 
         monstre5=GardienForet()
         while(monstre5.attribut!='Vent'):
             monstre5=GardienForet()
-        monstre5.surnom='Gardien de Vent de la Forêt'
+        monstre5.surnom='Gardien de la Forêt'
 
         monstre6=GardienForet()
         while(monstre6.attribut!='Vent'):
             monstre6=GardienForet()
-        monstre6.surnom='Gardien de Vent de la Forêt'
+        monstre6.surnom='Gardien de la Forêt'
 
         boss=GardienForet()
         while(boss.attribut!='Vent'):
@@ -284,7 +284,7 @@ class ForetVeur:
         Monstre.evoluer(boss)
         Monstre.evoluer(boss)
         Monstre.monter_en_niveau_sans_affichage(boss)
-        boss.surnom='Gardien suprême de Vent de la Forêt'
+        boss.surnom='Gardien Suprême de la Forêt'
 
         XP_recompense=803
         recompense=[XP_recompense,ForetVeur.recompenses(niveau)]
@@ -1420,7 +1420,7 @@ class CratereAter():
 
 
     def Niveau3():
-        nom='le CraterAter Niveau 3 - Etage -3 '
+        nom='le Cratère Ater Niveau 3 - Etage -3 '
         nom_famille='CratereAter'
         niveau=3
         attribut='Vent'
@@ -2422,7 +2422,7 @@ class RuinesSenzargen:
             boss=Sylphide()
         while(boss.niveau!=14):
             Monstre.monter_en_niveau_sans_affichage(boss)
-        boss.surnom='Hayate le Bourrasque'
+        boss.surnom='Hayate la Bourrasque'
     
         '''
         monstre6=Hayate()

@@ -62,15 +62,55 @@ def initialisation_fenetre(dimensions_fenetre):
 
 
 
-def initialisation_background(fenetre):
-
+def initialisation_background(fenetre,nom_niveau_donjon):
 	# Définition de l'image de fond et du sol, chargement et collage de celles-ci
 	# Pour l'instant pas de sol (plus classe sans)
 	# ground = pygame.image.load("Graphism/Battle_background_2_down/ground_2_06.png").convert_alpha()
 	# Dimensions : Largeur : 617 ; Hauteur : 479
 	#fenetre.blit(ground, (0,400))
-	background = pygame.image.load("Graphism/Battle_background_1/sprite_16.png").convert_alpha()
+
+	if('Forêt Veur' in nom_niveau_donjon):
+		if('Niveau 1' in nom_niveau_donjon or 'Niveau 7' in nom_niveau_donjon):
+			background = pygame.image.load("Graphism/Battle_background_1/sprite_16.png").convert_alpha()
+			ground = pygame.image.load("Graphism/Battle_background_2_down/ground_2_13.png")
+		elif('Niveau 2' in nom_niveau_donjon  or 'Niveau 3' in nom_niveau_donjon or 'Niveau 4' in nom_niveau_donjon or 'Niveau 5' in nom_niveau_donjon):
+			background = pygame.image.load("Graphism/Battle_background_1/sprite_17.png").convert_alpha()
+			ground = pygame.image.load("Graphism/Battle_background_2_down/ground_2_06.png")
+		elif('Niveau 6' in nom_niveau_donjon):
+			background = pygame.image.load("Graphism/Battle_background_2/background_01.png").convert_alpha()
+			ground = pygame.image.load("Graphism/Battle_background_2_down/ground_2_06.png")
+
+	elif('Cratère Ater' in nom_niveau_donjon):
+		if('Niveau 1' in nom_niveau_donjon or 'Niveau 2' in nom_niveau_donjon or 'Niveau 3' in nom_niveau_donjon):
+			background = pygame.image.load("Graphism/Battle_background_2/background_07.png").convert_alpha()
+			ground = pygame.image.load("Graphism/Battle_background_2_down/ground_2_00.png")
+		elif('Niveau 6' in nom_niveau_donjon):
+			background = pygame.image.load("Graphism/Battle_background_4/background_4_13.png").convert_alpha()
+			ground = background
+			# ground = pygame.image.load("Graphism/Battle_background_1_down/ground_1_08.png")
+		elif('Niveau 4' in nom_niveau_donjon or 'Niveau 5' in nom_niveau_donjon or 'Niveau 7' in nom_niveau_donjon):
+			background = pygame.image.load("Graphism/Battle_background_2/background_10.png").convert_alpha()
+			ground = pygame.image.load("Graphism/Battle_background_3_down/ground_3_03.png")
+
+	elif('Mont Tagne' in nom_niveau_donjon):
+		if('Niveau 1' in nom_niveau_donjon or 'Niveau 4' in nom_niveau_donjon or 'Niveau 5' in nom_niveau_donjon or 'Niveau 6' in nom_niveau_donjon):
+			background = pygame.image.load("Graphism/Battle_background_2/background_05.png").convert_alpha()
+			ground = pygame.image.load("Graphism/Battle_background_2_down/ground_2_11.png").convert_alpha()
+		elif('Niveau 2' in nom_niveau_donjon or 'Niveau 3' in nom_niveau_donjon or 'Niveau 7' in nom_niveau_donjon):
+			background = pygame.image.load("Graphism/Battle_background_1/sprite_05.png").convert_alpha()
+			ground = pygame.image.load("Graphism/Battle_background_2_down/ground_2_10.png")
+
+	elif('Ruines de Senzargen' in nom_niveau_donjon):
+		# Pour les Autels Sacrificiels : Graphism/Battle_background_general_2/general_background_2_8.png
+		if('Niveau 1' in nom_niveau_donjon or 'Niveau 4' in nom_niveau_donjon or 'Niveau 5' in nom_niveau_donjon or 'Niveau 7' in nom_niveau_donjon):
+			background = pygame.image.load("Graphism/Battle_background_general_2/general_background_2_8.png").convert_alpha()
+			ground = pygame.image.load("Graphism/Battle_background_3_down/ground_3_16.png")
+		elif('Niveau 2' in nom_niveau_donjon or 'Niveau 3' in nom_niveau_donjon or 'Niveau 6' in nom_niveau_donjon):
+			background = pygame.image.load("Graphism/Battle_background_general_2/general_background_2_7.png").convert_alpha()
+			ground = pygame.image.load("Graphism/Battle_background_3_down/ground_3_03.png")
+
 	# Dimensions : Largeur : 617 ; Hauteur : 480
+	fenetre.blit(ground, (0,140))
 	fenetre.blit(background, (0,0))
 	# Rafraîchissement de l'écran
 	pygame.display.flip()
@@ -80,13 +120,37 @@ def initialisation_background(fenetre):
 
 def trouver_image_monstre(nom_monstre,nom_niveau_donjon):
 	if('Forêt Veur' in nom_niveau_donjon):
-		nom_donjon='ForetVeur'
-	nom_image = "Graphism/Monstres_RPG_Maker/" + nom_donjon + "/" + nom_monstre + ".png"
-	image = pygame.image.load(nom_image).convert_alpha()
+		nom_donjon = 'ForetVeur'
+	elif('Cratère Ater' in nom_niveau_donjon):
+		nom_donjon = 'CratereAter'
+	elif('Mont Tagne' in nom_niveau_donjon):
+		nom_donjon = 'MontTagne'
+	elif('Ruines de Senzargen' in nom_niveau_donjon):
+		nom_donjon = 'RuinesSenzargen'
+	
 	if(nom_monstre == 'Gardien de la Forêt'):
 		image = pygame.image.load("Graphism/Monstres_RPG_Maker/ForetVeur/Gardien.png").convert_alpha()
-	if(nom_monstre == 'Plante Carnivore'):
+	elif(nom_monstre == 'Plante Carnivore'):
 		image = pygame.image.load("Graphism/Monstres_RPG_Maker/ForetVeur/Plante.png").convert_alpha()
+	elif(nom_monstre == 'Chauve Souris'):
+		image = pygame.image.load("Graphism/Monstres_RPG_Maker/CratereAter/ChauveSouris.png").convert_alpha()
+	elif(nom_monstre == 'Soldat Squelette'):
+		image = pygame.image.load("Graphism/Monstres_RPG_Maker/CratereAter/Skeleton.png").convert_alpha()
+	elif(nom_monstre == 'Dame Harpie'):
+		image = pygame.image.load("Graphism/Monstres_RPG_Maker/RuinesSenzargen/DameHarpie.png").convert_alpha()
+	elif(nom_monstre == 'Bas Elementaire'):
+		image = pygame.image.load("Graphism/Monstres_RPG_Maker/RuinesSenzargen/BasElementaire.png").convert_alpha()
+	elif(nom_monstre == 'Haut Elementaire'):
+		image = pygame.image.load("Graphism/Monstres_RPG_Maker/RuinesSenzargen/HautElementaire.png").convert_alpha()
+	elif(nom_monstre == 'Sylphe'):
+		image = pygame.image.load("Graphism/Monstres_RPG_Maker/RuinesSenzargen/Arashi.png").convert_alpha()
+	elif(nom_monstre == 'Sylphide'):
+		image = pygame.image.load("Graphism/Monstres_RPG_Maker/RuinesSenzargen/Hayate.png").convert_alpha()
+
+	else:
+		nom_image = "Graphism/Monstres_RPG_Maker/" + nom_donjon + "/" + nom_monstre + ".png"
+		image = pygame.image.load(nom_image).convert_alpha()
+		#print("\n\n Nom de l'image : \n",nom_image,"\n\n")
 	return image
 
 
@@ -107,8 +171,7 @@ def initialisation_monstres(fenetre,dimensions_fenetre,equipe_ennemis,region):
 	
 	for index in range(equipe_ennemis.len):
 		if('Forêt Veur' in equipe_ennemis.nom_niveau_donjon):
-		# if(equipe_ennemis.nom_niveau_donjon == 'la Forêt Veur Niveau 1 - Entrée '):
-			if(equipe_ennemis.membres[index].pv_actuels > 0):
+			if(equipe_ennemis.membres[index] != 0 and equipe_ennemis.membres[index].pv_actuels > 0):
 				perso_tmp = trouver_image_monstre(equipe_ennemis.membres[index].nom, equipe_ennemis.nom_niveau_donjon)
 				# pygame.image.load("Graphism/Monstres_RPG_Maker/Orc.png").convert_alpha() par exemple 
 				images_persos.append(perso_tmp)
@@ -126,24 +189,6 @@ def initialisation_monstres(fenetre,dimensions_fenetre,equipe_ennemis,region):
 				positions_persos.append([position_x_perso_tmp,position_y_perso_tmp])
 				fenetre.blit(perso_tmp, [position_x_perso_tmp,position_y_perso_tmp])
 
-				'''
-				AVANT
-				message = equipe_ennemis.membres[index].surnom + " " + equipe_ennemis.membres[index].attribut + " : " + str(equipe_ennemis.membres[index].pv_actuels) + " PV"
-				#  sur " + str(equipe_ennemis.membres[index].pv_max_donjons)
-				message_2 = "Jauge d'attaque : " + str(equipe_ennemis.membres[index].jauge_attaque)
-				
-				message = police.render(message, 1, (255,255,255))
-				message_2 = police.render(message_2, 1, (255,255,255))
-
-				# FORMULE A RECALCULER POUR UN MEILLEUR AFFICHAGE 
-				position_y_message = position_y_perso_tmp + 200 - 15*(index%2)
-				if(equipe_ennemis.membres[index].nom == 'Gardien de la Forêt'):
-					position_y_message = position_y_perso_tmp + 300 - 15*(index%2)
-
-				fenetre.blit(message,(position_x_perso_tmp,position_y_message))
-				fenetre.blit(message_2,(position_x_perso_tmp,position_y_message + 50))
-				'''
-				# Maintenant :
 				barres_de_vie[index] = pygame.image.load("Graphism/trop_des_barres/barre_vie.png").convert_alpha()
 				barres_de_attaque[index] = pygame.image.load("Graphism/trop_des_barres/barre_attaque.png").convert_alpha()
 
@@ -152,12 +197,14 @@ def initialisation_monstres(fenetre,dimensions_fenetre,equipe_ennemis,region):
 				jauge_de_vie_actuelle = pygame.transform.scale(jauge_de_vie, (10,100))
 				jauge_de_attaque_actuelle = pygame.transform.scale(jauge_de_attaque, (10,100))
 
+				position_x_barre_de_vie = position_x_perso_tmp - 15
 				position_y_barre_de_vie = position_y_perso_tmp - 100 - 15*(index%2)
 				if(equipe_ennemis.membres[index].nom == 'Gardien de la Forêt'):
-					position_y_barre_de_vie = position_y_perso_tmp - 150 - 15*(index%2)
+					position_x_barre_de_vie += 60
+					position_y_barre_de_vie = position_y_perso_tmp - 100
 					
-				fenetre.blit(barres_de_vie[index], (position_x_perso_tmp - 15,position_y_barre_de_vie))
-				fenetre.blit(barres_de_attaque[index], (position_x_perso_tmp - 15,position_y_barre_de_vie + 30))
+				fenetre.blit(barres_de_vie[index], (position_x_barre_de_vie,position_y_barre_de_vie))
+				fenetre.blit(barres_de_attaque[index], (position_x_barre_de_vie,position_y_barre_de_vie + 30))
 
 				nb_affichages_vie = int(20*(equipe_ennemis.membres[index].pv_actuels / equipe_ennemis.membres[index].pv_max_donjons))
 				# print("\n\n",equipe_ennemis.membres[index].pv_actuels," / ",equipe_ennemis.membres[index].pv_max_donjons," multiplié par 100 divisé par 5 = ",nb_affichages_vie,"\n\n")
@@ -167,10 +214,152 @@ def initialisation_monstres(fenetre,dimensions_fenetre,equipe_ennemis,region):
 				nb_affichages_attaque = equipe_ennemis.membres[index].jauge_attaque // 5
 				
 				for index in range(nb_affichages_vie):
-					fenetre.blit(jauge_de_vie_actuelle, (position_x_perso_tmp + 50 +5*index,position_y_barre_de_vie))
+					fenetre.blit(jauge_de_vie_actuelle, (position_x_barre_de_vie + 65 +5*index,position_y_barre_de_vie))
 				for index in range(nb_affichages_attaque):
-					fenetre.blit(jauge_de_attaque_actuelle, (position_x_perso_tmp + 50 +5*index,position_y_barre_de_vie + 30))
+					fenetre.blit(jauge_de_attaque_actuelle, (position_x_barre_de_vie + 65 +5*index,position_y_barre_de_vie + 30))
 	
+
+
+		if('Cratère Ater' in equipe_ennemis.nom_niveau_donjon):
+			if(equipe_ennemis.membres[index] != 0 and equipe_ennemis.membres[index].pv_actuels > 0):
+				perso_tmp = trouver_image_monstre(equipe_ennemis.membres[index].nom, equipe_ennemis.nom_niveau_donjon)
+				images_persos.append(perso_tmp)
+
+				position_x_perso_tmp = ((1+index)*dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2 - 30
+				position_y_perso_tmp = 200
+
+				#if(equipe_ennemis.membres[index].nom == 'Chauve Souris'):
+				#	position_x_perso_tmp = dimensions_fenetre[0]/4
+				#	position_y_perso_tmp = dimensions_fenetre[1]/2
+
+				positions_persos.append([position_x_perso_tmp,position_y_perso_tmp])
+				fenetre.blit(perso_tmp, [position_x_perso_tmp,position_y_perso_tmp])
+
+
+				barres_de_vie[index] = pygame.image.load("Graphism/trop_des_barres/barre_vie.png").convert_alpha()
+				barres_de_attaque[index] = pygame.image.load("Graphism/trop_des_barres/barre_attaque.png").convert_alpha()
+
+				jauge_de_vie = pygame.image.load("Graphism/trop_des_barres/jauge_vie.png").convert_alpha()
+				jauge_de_attaque = pygame.image.load("Graphism/trop_des_barres/jauge_attaque.png").convert_alpha()
+				jauge_de_vie_actuelle = pygame.transform.scale(jauge_de_vie, (10,100))
+				jauge_de_attaque_actuelle = pygame.transform.scale(jauge_de_attaque, (10,100))
+
+				position_x_barre_de_vie = position_x_perso_tmp - 15
+				position_y_barre_de_vie = position_y_perso_tmp - 100 - 15*(index%2)
+					
+				fenetre.blit(barres_de_vie[index], (position_x_barre_de_vie,position_y_barre_de_vie))
+				fenetre.blit(barres_de_attaque[index], (position_x_barre_de_vie,position_y_barre_de_vie + 30))
+
+				nb_affichages_vie = int(20*(equipe_ennemis.membres[index].pv_actuels / equipe_ennemis.membres[index].pv_max_donjons))
+				# print("\n\n",equipe_ennemis.membres[index].pv_actuels," / ",equipe_ennemis.membres[index].pv_max_donjons," multiplié par 100 divisé par 5 = ",nb_affichages_vie,"\n\n")
+				if(nb_affichages_vie == 0 and equipe_ennemis.membres[index].pv_actuels > 0):
+					nb_affichages_vie = 1
+				
+				nb_affichages_attaque = equipe_ennemis.membres[index].jauge_attaque // 5
+				
+				for index in range(nb_affichages_vie):
+					fenetre.blit(jauge_de_vie_actuelle, (position_x_barre_de_vie + 65 +5*index,position_y_barre_de_vie))
+				for index in range(nb_affichages_attaque):
+					fenetre.blit(jauge_de_attaque_actuelle, (position_x_barre_de_vie + 65 +5*index,position_y_barre_de_vie + 30))
+
+
+
+		if('Mont Tagne' in equipe_ennemis.nom_niveau_donjon):
+			if(equipe_ennemis.membres[index] != 0 and equipe_ennemis.membres[index].pv_actuels > 0):
+				perso_tmp = trouver_image_monstre(equipe_ennemis.membres[index].nom, equipe_ennemis.nom_niveau_donjon)
+				images_persos.append(perso_tmp)
+
+				position_x_perso_tmp = ((1+index)*dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2 - 30
+				position_y_perso_tmp = 200
+
+				if(equipe_ennemis.membres[index].nom == 'Slime'): 
+					position_y_perso_tmp += 80
+				if(equipe_ennemis.membres[index].nom == 'Golem'):
+					position_x_perso_tmp = position_x_perso_tmp - 150 + 50*index
+
+				positions_persos.append([position_x_perso_tmp,position_y_perso_tmp])
+				fenetre.blit(perso_tmp, [position_x_perso_tmp,position_y_perso_tmp])
+
+
+				barres_de_vie[index] = pygame.image.load("Graphism/trop_des_barres/barre_vie.png").convert_alpha()
+				barres_de_attaque[index] = pygame.image.load("Graphism/trop_des_barres/barre_attaque.png").convert_alpha()
+
+				jauge_de_vie = pygame.image.load("Graphism/trop_des_barres/jauge_vie.png").convert_alpha()
+				jauge_de_attaque = pygame.image.load("Graphism/trop_des_barres/jauge_attaque.png").convert_alpha()
+				jauge_de_vie_actuelle = pygame.transform.scale(jauge_de_vie, (10,100))
+				jauge_de_attaque_actuelle = pygame.transform.scale(jauge_de_attaque, (10,100))
+
+				position_x_barre_de_vie = position_x_perso_tmp - 15
+				position_y_barre_de_vie = position_y_perso_tmp - 100 - 15*(index%2)
+					
+				fenetre.blit(barres_de_vie[index], (position_x_barre_de_vie,position_y_barre_de_vie))
+				fenetre.blit(barres_de_attaque[index], (position_x_barre_de_vie,position_y_barre_de_vie + 30))
+
+				nb_affichages_vie = int(20*(equipe_ennemis.membres[index].pv_actuels / equipe_ennemis.membres[index].pv_max_donjons))
+				# print("\n\n",equipe_ennemis.membres[index].pv_actuels," / ",equipe_ennemis.membres[index].pv_max_donjons," multiplié par 100 divisé par 5 = ",nb_affichages_vie,"\n\n")
+				if(nb_affichages_vie == 0 and equipe_ennemis.membres[index].pv_actuels > 0):
+					nb_affichages_vie = 1
+				
+				nb_affichages_attaque = equipe_ennemis.membres[index].jauge_attaque // 5
+				
+				for index in range(nb_affichages_vie):
+					fenetre.blit(jauge_de_vie_actuelle, (position_x_barre_de_vie + 65 +5*index,position_y_barre_de_vie))
+				for index in range(nb_affichages_attaque):
+					fenetre.blit(jauge_de_attaque_actuelle, (position_x_barre_de_vie + 65 +5*index,position_y_barre_de_vie + 30))
+
+
+		if('Ruines de Senzargen' in equipe_ennemis.nom_niveau_donjon):
+			if(equipe_ennemis.membres[index] != 0 and equipe_ennemis.membres[index].pv_actuels > 0):
+				perso_tmp = trouver_image_monstre(equipe_ennemis.membres[index].nom, equipe_ennemis.nom_niveau_donjon)
+				images_persos.append(perso_tmp)
+
+				position_x_perso_tmp = ((1+index)*dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2 - 30
+				position_y_perso_tmp = 200
+
+				if(equipe_ennemis.membres[index].nom == 'Elementaire' or equipe_ennemis.membres[index].nom == 'Haut Elementaire'):
+					position_x_perso_tmp = position_x_perso_tmp - 150 + 50*index
+				if(equipe_ennemis.membres[index].nom == 'Haut Elementaire'):
+					position_x_perso_tmp -= 50
+				if(equipe_ennemis.membres[index].nom == 'Dame Harpie'):
+					position_x_perso_tmp = position_x_perso_tmp - 120 + 50*index
+				if(equipe_ennemis.membres[index].nom == 'Sylphe'):
+					position_x_perso_tmp -= 200
+				if(equipe_ennemis.membres[index].nom == 'Sylphide'):
+					position_x_perso_tmp -= 150
+
+				positions_persos.append([position_x_perso_tmp,position_y_perso_tmp])
+				fenetre.blit(perso_tmp, [position_x_perso_tmp,position_y_perso_tmp])
+
+
+				barres_de_vie[index] = pygame.image.load("Graphism/trop_des_barres/barre_vie.png").convert_alpha()
+				barres_de_attaque[index] = pygame.image.load("Graphism/trop_des_barres/barre_attaque.png").convert_alpha()
+
+				jauge_de_vie = pygame.image.load("Graphism/trop_des_barres/jauge_vie.png").convert_alpha()
+				jauge_de_attaque = pygame.image.load("Graphism/trop_des_barres/jauge_attaque.png").convert_alpha()
+				jauge_de_vie_actuelle = pygame.transform.scale(jauge_de_vie, (10,100))
+				jauge_de_attaque_actuelle = pygame.transform.scale(jauge_de_attaque, (10,100))
+
+				position_x_barre_de_vie = position_x_perso_tmp - 15
+				position_y_barre_de_vie = position_y_perso_tmp - 100 - 15*(index%2)
+					
+				fenetre.blit(barres_de_vie[index], (position_x_barre_de_vie,position_y_barre_de_vie))
+				fenetre.blit(barres_de_attaque[index], (position_x_barre_de_vie,position_y_barre_de_vie + 30))
+
+				nb_affichages_vie = int(20*(equipe_ennemis.membres[index].pv_actuels / equipe_ennemis.membres[index].pv_max_donjons))
+				# print("\n\n",equipe_ennemis.membres[index].pv_actuels," / ",equipe_ennemis.membres[index].pv_max_donjons," multiplié par 100 divisé par 5 = ",nb_affichages_vie,"\n\n")
+				if(nb_affichages_vie == 0 and equipe_ennemis.membres[index].pv_actuels > 0):
+					nb_affichages_vie = 1
+				
+				nb_affichages_attaque = equipe_ennemis.membres[index].jauge_attaque // 5
+				
+				for index in range(nb_affichages_vie):
+					fenetre.blit(jauge_de_vie_actuelle, (position_x_barre_de_vie + 65 +5*index,position_y_barre_de_vie))
+				for index in range(nb_affichages_attaque):
+					fenetre.blit(jauge_de_attaque_actuelle, (position_x_barre_de_vie + 65 +5*index,position_y_barre_de_vie + 30))
+
+
+
+
 	# Rafraîchissement de l'écran
 	pygame.display.flip()
 
@@ -179,28 +368,114 @@ def initialisation_monstres(fenetre,dimensions_fenetre,equipe_ennemis,region):
 
 # On est obligé de transmettre une clé pour enregistrer le relâchement d'une touche
 # Si la touche relâchée est un déplacmeent latéral, on actualise la position en x
-def initialisation_choice(fenetre,position_choice,nom_monstre,police,key):
-	choice_huge = pygame.image.load("Graphism/viseur.png").convert_alpha()
+def initialisation_choice(fenetre,position_choice,nom_monstre,police,key,index_targeted_personnage):
+	choice_huge = pygame.image.load("Graphism/viseur-2.png").convert_alpha()
 	choice = pygame.transform.scale(choice_huge, (80,80))
-	#choice = choice_huge
 
+	# ATTENTION !!!!!!!!!!!!
+	# L'unique inconvénient de Python est l'égalité implicite entre pointeurs de type liste
+	# ON NE DOIT DONC SURTOUT PAS FAIRE real_position_choice = position_choice
+	# car modifier l'une même dans cette sous-fonction revient à modifier l'autre en global 
 	real_position_choice = [0,0]
 	real_position_choice[0] = position_choice[0]
 	real_position_choice[1] = position_choice[1]
+
+
 	# Si c'est une abeille (oui... je me déprime :'(  )
 	if(nom_monstre == 'Champignon'):
 		if(key == K_LEFT or key == K_RIGHT):
-		#	print("\n\n OUIIIIIIIIII : ",key," == K_LEFT or K_RIGHT \n\n")
 			real_position_choice[0] -= 30
-		#else:
-		#	print("\n\n KEY = ",key," != K_LEFT or K_RIGHT \n\n")
 		if(real_position_choice[1] > 225):
 			real_position_choice[1] -= 30
-		#print("\n\n Position choice : ",position_choice,"\n\n Real position choice : ",real_position_choice,"\n\n")
+	
+	if(nom_monstre == 'Gardien de la Forêt'):
+		choice = pygame.transform.scale(choice_huge, (130,130))
+		real_position_choice[1] -= 30
+		if(index_targeted_personnage == 0):
+			real_position_choice[0] -= 30
+		elif(index_targeted_personnage == 1):
+			real_position_choice[0] -= 15
+
+	if(nom_monstre == 'Plante Carnivore'):
+		choice = pygame.transform.scale(choice_huge, (130,130))
+		real_position_choice[1] -= 60
+		if(index_targeted_personnage == 0):
+			real_position_choice[0] -= 30
+		elif(index_targeted_personnage == 1):
+			real_position_choice[0] -= 15
+		elif(index_targeted_personnage == 2):
+			real_position_choice[0] += 15
+	
+	if(nom_monstre == 'Inugami'):
+		choice = pygame.transform.scale(choice_huge, (60,60))
+		real_position_choice[0] += 40
+		real_position_choice[1] += 20
+	
+	if(nom_monstre == 'Chauve Souris'):
+		real_position_choice[0] -= 20
+		real_position_choice[1] -= 40
+	
+	if(nom_monstre == 'Soldat Squelette'):
+		real_position_choice[0] += 5
+		real_position_choice[1] -= 30
+
+	if(nom_monstre == 'Imp'):
+		real_position_choice[0] -= 10
+		real_position_choice[1] -= 60
+	
+	if(nom_monstre == 'Mastodonte'):
+		real_position_choice[0] += 50
+
+	if(nom_monstre == 'Canniboite'):
+		real_position_choice[0] -= 25
+		real_position_choice[1] -= 25
+
+	if(nom_monstre == 'Golem'):
+		if(index_targeted_personnage == 0):
+			real_position_choice[0] -= 70
+			real_position_choice[1] += 40
+		elif(index_targeted_personnage == 1):
+			real_position_choice[0] -= 20
+			real_position_choice[1] += 40
+		elif(index_targeted_personnage == 2):
+			real_position_choice[0] += 30
+			real_position_choice[1] += 40
+	
+	if(nom_monstre == 'Dame Harpie'):
+		real_position_choice[1] += 80
+		if(index_targeted_personnage == 0):
+			real_position_choice[0] -= 50
+		elif(index_targeted_personnage == 2):
+			real_position_choice[0] += 50
+
+	if(nom_monstre == 'Bas Elementaire'):
+		real_position_choice[0] -= 10
+		real_position_choice[1] -= 10
+	
+	if(nom_monstre == 'Elementaire' and index_targeted_personnage == 0):
+		real_position_choice[0] -= 90
+	
+	if(nom_monstre == 'Haut Elementaire'):
+		real_position_choice[0] -= 50
+		if(index_targeted_personnage == 0):
+			real_position_choice[0] -= 50
+		if(index_targeted_personnage == 2):
+			real_position_choice[0] += 50
+
+	if(nom_monstre == 'Sylphe'):
+		real_position_choice[0] -= 100
+	if(nom_monstre == 'Sylphide'):
+		real_position_choice[0] -= 40
+		real_position_choice[1] += 40
+
+	#print("\n\n Position choice : ",position_choice,"\n\n Real position choice : ",real_position_choice,"\n\n")
 	fenetre.blit(choice, real_position_choice)
 
 	message = police.render("Quel monstre voulez-vous attaquer ? ", 1, (255,0,0))
-	fenetre.blit(message, (30, 50)) 
+	if(nom_monstre == 'Gardien de la Forêt'):
+		fenetre.blit(message, (10,10))
+	else:
+		fenetre.blit(message, (30, 50)) 
 
 	# Rafraîchissement de l'écran
 	pygame.display.flip()
@@ -240,7 +515,7 @@ def initialisation_print(fenetre,police,liste_de_messages,option):
 
 # print('C\'est au tour de ... ') est réalisé par l'appel graphism(equipe_ennemis,[0,'C\'est ...'])
 def graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication):
-	fond = initialisation_background(fenetre)
+	fond = initialisation_background(fenetre,equipe_ennemis.nom_niveau_donjon)
 	monstres = initialisation_monstres(fenetre,dimensions_fenetre,equipe_ennemis,1)
 	police = pygame.font.SysFont("arial", 16)
 	right_arrow = pygame.image.load("Graphism/right_arrow.gif").convert_alpha()
@@ -255,7 +530,7 @@ def graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 	index = 0
 	nb_ennemis_vivants = 0
 	while(index < equipe_ennemis.len):
-		if(equipe_ennemis.membres[index].pv_actuels > 0):
+		if(equipe_ennemis.membres[index] != 0 and equipe_ennemis.membres[index].pv_actuels > 0):
 			nb_ennemis_vivants += 1
 		index += 1
 
@@ -316,7 +591,7 @@ def graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 						if(choix_capacite_tmp > possibilites_capacite_speciale[len(possibilites_capacite_speciale)-1]):
 							choix_capacite_tmp -= possibilites_capacite_speciale[len(possibilites_capacite_speciale)-1]
 						
-						dimensions_fenetre = [2*617,480]
+						dimensions_fenetre = [2*617,2*480]
 						fenetre = initialisation_fenetre(dimensions_fenetre)
 						graphism(fenetre,dimensions_fenetre,equipe_ennemis,[616,indication[1]])
 						initialisation_print(fenetre, police, indication[1], [617,right_arrow,choix_capacite_tmp])
@@ -326,7 +601,7 @@ def graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 						if(choix_capacite_tmp == 0):
 							choix_capacite_tmp = possibilites_capacite_speciale[len(possibilites_capacite_speciale)-1]
 						
-						dimensions_fenetre = [2*617,480]
+						dimensions_fenetre = [2*617,2*480]
 						fenetre = initialisation_fenetre(dimensions_fenetre)
 						graphism(fenetre,dimensions_fenetre,equipe_ennemis,[616,indication[1]])
 						initialisation_print(fenetre, police, indication[1], [617,right_arrow,choix_capacite_tmp])
@@ -354,18 +629,12 @@ def graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 		position_choice = [(dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2, 250]
 		# Actualisation de la position de la flèche de choix
 		fenetre = initialisation_fenetre(dimensions_fenetre)
-		fond = initialisation_background(fenetre)
+		fond = initialisation_background(fenetre,equipe_ennemis.nom_niveau_donjon)
 		monstres = initialisation_monstres(fenetre,dimensions_fenetre,equipe_ennemis,1)
 
 		# indication[1] : le choix retenu,  indication[2] : la liste des messages
 		graphism(fenetre,dimensions_fenetre,equipe_ennemis,[616,indication[2]])
 		initialisation_print(fenetre, police, indication[2], [617,right_arrow,indication[1]])
-
-		'''
-		initialisation_choice(fenetre,position_choice,equipe_ennemis.membres[index_targeted_personnage].nom,police,K_LEFT)
-		# Rafraichissement de l'écran
-		pygame.display.flip()
-		'''
 
 		index = 0
 		while(index < equipe_ennemis.len and equipe_ennemis.membres[index].pv_actuels <= 0):
@@ -373,9 +642,9 @@ def graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 			position_choice[0] += (dimensions_fenetre[0] / (equipe_ennemis.len + 1))/2
 			index += 1
 		
-		initialisation_choice(fenetre,position_choice,equipe_ennemis.membres[0].nom,police,K_LEFT)
+		initialisation_choice(fenetre,position_choice,equipe_ennemis.membres[0].nom,police,K_LEFT,index)
 		# Rafraîchissement de l'écran
-		pygame.display.flip()
+		# pygame.display.flip()
 
 		continuer = 1
 		valider = 1
@@ -531,7 +800,7 @@ def graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 					initialisation_print(fenetre, police, indication[2], [617,right_arrow,indication[1]])
 
 					# Rafraichissement de l'écran
-					pygame.display.flip()
+					# pygame.display.flip()
 					'''
 
 				if event.type == KEYUP:
@@ -540,16 +809,16 @@ def graphism(fenetre,dimensions_fenetre,equipe_ennemis,indication):
 
 					# Actualisation de la position du viseur de choix
 					fenetre = initialisation_fenetre(dimensions_fenetre)
-					fond = initialisation_background(fenetre)
+					fond = initialisation_background(fenetre,equipe_ennemis.nom_niveau_donjon)
 					monstres = initialisation_monstres(fenetre,dimensions_fenetre,equipe_ennemis,1)
 				
 					# indication[1] : le choix retenu,  indication[2] : la liste des messages
 					graphism(fenetre,dimensions_fenetre,equipe_ennemis,[616,indication[2]])
 					initialisation_print(fenetre, police, indication[2], [617,right_arrow,indication[1]])
 
-					initialisation_choice(fenetre,position_choice,equipe_ennemis.membres[index_targeted_personnage].nom,police,event.key)
+					initialisation_choice(fenetre,position_choice,equipe_ennemis.membres[index_targeted_personnage].nom,police,event.key,index_targeted_personnage)
 					# Rafraîchissement de l'écran
-					pygame.display.flip()
+					# pygame.display.flip()
 
 		# Quand le joueur a validé son choix et que ce dernier est correct 
 		return index_targeted_personnage

@@ -361,75 +361,23 @@ class Game:
         
         equipe_ennemis=self.niveau_donjon.monstres_region(self)
         equipe_ennemis.nom_niveau_donjon = self.niveau_donjon.nom
-
-        # A ENLEVER !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        '''
-        for index in range(equipe_allies.len):
-            if (equipe_allies.membres[index] == 'ChevalierMagique'):
-                nom_tmp = equipe_allies.membres[index].nom
-                attribut_tmp = equipe_allies.membres[index].attribut
-                classe_tmp = equipe_allies.membres[index].classe
-                niveau_tmp = equipe_allies.membres[index].niveau
-                XP_tmp = equipe_allies.membres[index].XP_avant_prochain_niveau
-                indice_stockage_tmp = equipe_allies.membres[index].indice_stockage_base
-
-                monstre=Monstre.reset_monstre(nom_tmp)
-                while(monstre.attribut!=attribut_tmp):
-                    monstre=Monstre.reset_monstre(nom_tmp)
-                while(monstre.classe != classe_tmp):
-                    monstre.Evoluer()
-                while(monstre.niveau != niveau_tmp):
-                    monstre.monter_en_niveau_sans_affichage()
-
-                monstre.XP_avant_prochain_niveau = XP_tmp
-                monstre.indice_stockage_base=indice_stockage_tmp
-                equipe_allies.membres[index] = monstre
-                self.stockage[index] = monstre
-
-        if(self.niveau_donjon.nom == 'les Ruines de Senzargen Niveau 7 - Autel Sacrificiel '):
-            monstre6=Sylphe()
-            while(monstre6.attribut!='Vent'):
-                monstre6=Sylphe()
-            while(monstre6.niveau!=14):
-                Monstre.monter_en_niveau_sans_affichage(monstre6)
-            monstre6.surnom='Arashi la Tempête'
-            if(self.niveau_donjon.region == 3):
-                equipe_ennemis.membres[0]=monstre6
-
-        if(self.niveau_donjon.nom == 'le Mont Tagne Niveau 7 - Caverne au Sommet '):
-            boss=Golem()
-            while(boss.attribut!='Feu'):
-                boss=Golem()
-            Monstre.evoluer(boss)
-            while(boss.niveau!=8):
-                Monstre.monter_en_niveau_sans_affichage(boss)
-            boss.surnom='Golem rouge Royal'
-            boss.defense_max_donjons=2*boss.defense_max_donjons
-            boss.defense=2*boss.defense
-            boss.defense_actuelle=boss.defense_max_donjons
-            boss.pv_max_donjons=2*boss.pv_max_donjons
-            boss.pv=2*boss.pv
-            boss.pv_actuels=2*boss.pv_actuels
-            if(self.niveau_donjon.region == 3):
-                equipe_ennemis.membres[0] = boss
-
-        self.recompenses_donnees=[0,0,0,0]
-
-        self.recompenses_globales=[Elfe(),[Fee(),Fee()],ChevalierMagique(),Vampire()]
-
-        while(self.recompenses_globales[3].attribut != 'Feu'):
-            self.recompenses_globales[3]=Vampire()
-
-        self.types_recompenses_globales=['Monstre','Monstres','Monstre','Monstre'] # A CHANGER EN monstreS
-        
-        self.recompenses_globales_totales=[self.recompenses_donnees,self.recompenses_globales,self.types_recompenses_globales]
-        '''
-        # JUSQU'ICI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 
         # On réinitialise ici toutes les stats max_donjons 
-        # Pas besoin de les modifier dans les Anti 
+        # Pas besoin de les modifier dans les Anti
         for index in range(equipe_ennemis.len):
             equipe_ennemis.membres[index].preparer_au_combat()
+
+            # A ENLEVER !!!! Un jour ...
+            if(equipe_ennemis.membres[index].nom == 'Sylphe'):
+                equipe_ennemis.membres[index] = Sylphe()
+                while(equipe_ennemis.membres[index].attribut!='Vent'):
+                    equipe_ennemis.membres[index] = Sylphe()
+                while(equipe_ennemis.membres[index].niveau!=14):
+                    equipe_ennemis.membres[index].monter_en_niveau_sans_affichage()
+                equipe_ennemis.membres[index].surnom='Arashi la Tempête'
+                equipe_ennemis.membres[index].preparer_au_combat()
+            
+
 
         # Si ForetVeur Niveau 1, region = 3 mais on prépare quand même au combat 
         if(self.niveau_donjon.region == 1 or (self.niveau_donjon.nom_famille == 'ForetVeur' and self.niveau_donjon.niveau == 1)):
@@ -439,14 +387,6 @@ class Game:
 
         survivants=equipe_allies.combat_xVx_avec_capacites_speciales(equipe_ennemis)
         equipe_ennemis.soigner_team_ennemie()
-
-        '''
-        equipe_allies_tmp=[allie1]
-        if(allie2!=0):
-            equipe_allies_tmp.append(allie2)
-        if(allie3!=0):
-            equipe_allies_tmp.append(allie3)
-        '''
 
 
         if(survivants=='allies'):
@@ -1086,8 +1026,23 @@ class Game:
             self.ecrire_sauvegarde(equipe_1)
             print('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n')
             print('La sauvegarde a bien été effectuée. \n\n')
-            sys.exit()
 
+            entree=input('\nOui = 0\nNon = 1\nVoulez-vous quitter ? ')
+            while(not Security.is_decimal(entree)):
+                entree=input('\nOui = 0\nNon = 1\nVoulez-vous quitter ? ')
+            choix_menu=int(entree)
+            while(choix_menu not in [0,1]):
+                entree=input('\nOui = 0\nNon = 1\nVoulez-vous quitter ? ')
+                while(not Security.is_decimal(entree)):
+                    entree=input('\nOui = 0\nNon = 1\nVoulez-vous quitter ? ')
+                choix_menu=int(entree)
+            
+            if(choix_menu == 0):
+                print("\n\n")
+                sys.exit()
+            elif(choix_menu == 1):
+                print("\n\n\n\n")
+                self.possibilites(equipe_1)
 
 
 

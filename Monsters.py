@@ -3002,6 +3002,8 @@ class Monstre:
                 if(self.etat_cap4 == 'dispo'):
                     possibilites_capacite_speciale.append(4)
         
+        if (len(possibilites_capacite_speciale) == 0):
+            possibilites_capacite_speciale.append(1)
         indice_aleatoire=random.randint(0,len(possibilites_capacite_speciale)-1)
         while(possibilites_capacite_speciale[indice_aleatoire] not in possibilites_capacite_speciale):
             indice_aleatoire=random.randint(0,len(possibilites_capacite_speciale)-1)
