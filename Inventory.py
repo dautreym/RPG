@@ -539,7 +539,7 @@ class Inventaire:
                     choix_objet_a_vendre_2=int(entree)
 
                 if(choix_objet_a_vendre_2==1):
-                    print('Je vois, vous avez changé d\'avis!! \n')
+                    print('Je vois, vous avez changé d\'avis!!  \n')
                     self.magasin()
                 else:
                     possibilites_runes_a_vendre=[]

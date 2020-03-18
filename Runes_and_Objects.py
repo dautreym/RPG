@@ -200,7 +200,7 @@ class Runes:
             self.gains[index]=liste_des_gains[index]
 
         self.bonus_secondaires=bonus_secondaires
-        # Appliquer les bonus secondaires à gain_en_... ?
+        # Appliquer les bonus secondaires à gain_en_ ... ?
 
 
     def __str__(self):

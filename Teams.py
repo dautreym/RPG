@@ -19,7 +19,7 @@ from Monsters import *
 
 
 class Equipe:
-    # IMPORTANT POUR TOUTES LES FONCTIONS : UNE EQUIPE COMPORTE AU MINIMUM UN LEADER != 0 !!
+    # IMPORTANT POUR TOUTES LES FONCTIONS : UNE EQUIPE COMPORTE AU MINIMUM UN LEADER != 0 !!!!
     def __init__(self,game,liste_de_monstres,taille):
         self.taille_petite_equipe=3
         self.taille_moyenne_equipe=5

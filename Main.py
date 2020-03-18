@@ -58,7 +58,7 @@ if(choix == 0):
     equipe_1=partie.debut()
 
     partie.ecrire_sauvegarde(equipe_1)
-    print('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n')
+    print('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n')
     partie.possibilites(equipe_1)
 
 
