@@ -2,13 +2,30 @@
 
 This is a beta-version of a RPG i'm creating all by myself, so it's obviously not perfect.
 
-I'm currently working on graphics, which are not fully available for now.
+I just finished working on graphics, so they are available!!
 
-If you want a full-working version (without graphics), please use only the "RPG_all_data.py" file (you can execute it using "python3 RPG_all_data.py" in a terminal).
+Note that you will still need a terminal (see below) if you really want all data regarding what's happening in the game, but you are fully able to play without looking at it ;)
 
-Otherwise you can dowload all "UPDATED" files and play using "python3 Main.py" in a terminal (then think about saving your adventure after each important action).
+You can download all files with the "Clone or Download" button.
+
+Then open in a terminal, move on your Download folder and write the following instructions :
+
+unzip RPG-master.zip
+
+cd RPG-master
+
+python3 Main.py
+
+!! IMPORTANT !! 
+
+This is still a beta version, so think about saving your adventure after each important action !!
 
 Thank you for your understanding :)
 
-If you like it or want to improve it, feel free to send me a feedback at dautreym@gmail.com ;)
+!! ALSO IMPORTANT !!
+
+THERE IS ABSOLUTELY NO WARRANTY OF ANY KIND USING ANY OF THOSE FILES.
+
+IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 
