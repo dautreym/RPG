@@ -6072,7 +6072,7 @@ class Lutin(Monstre):
                     if(effet_nefaste<=100*limite_reussite):
                         self.slow_down(equipe_ennemie.membres[index],2)
 
-    def Ignition(self,cible):
+    def ignition(self,cible):
         print('\n',self.surnom,self.attribut,' réduit ',cible.surnom,cible.attribut,' en cendres avec un sort de feu!!\n')
         degats=90+self.calcul_dommages(4.6,self.capacite2_bonus_skill,cible)
         self.affichage_du_type_de_coup(4.6,self.capacite2_bonus_skill,degats,cible)
