@@ -13,6 +13,7 @@ import sys
 from ast import literal_eval
 
 from Graphism_ForetVeur import *
+from Server import *
 
 #from Runes_and_Objects import *
 #from Dungeon import *
@@ -25,7 +26,7 @@ from Functions import *
 from Inventory_and_Teams import *
 from Runes_and_Objects import *
 '''
-# CORIIGER LES .POP!!!!
+# CORRIGER LES .POP!!!!
 
 class Monstre:
     def __init__(self, nom_donne, attribut_donne, classe_donnee, niveau_donne, pv_donnes, pv_actuels_donnes, attaque_donnee, defense_donnee, vitesse_donnee):
@@ -437,6 +438,7 @@ class Monstre:
 
 
     def reset_monstre(nom_creature):
+        creature = 0
         # Faire un or pour les noms séparés
         if(nom_creature == 'Slime'):
             creature=Slime()
@@ -2187,10 +2189,12 @@ class Monstre:
                                     capacite_choisie(self,team_ennemis,team_allies)
 
                         else:
+                            cible_trouvee = False
                             for index in range(team_ennemis.len):
                                 if(team_ennemis.membres[index].indice_provocation > 0):
                                     cible=team_ennemis.membres[index]
-                            else:
+                                    cible_trouvee = True
+                            if (cible_trouvee == False):
                                 possibilites_provocation=[]
                                 for index in range(team_ennemis.len):
                                     if(team_ennemis.membres[index].pv_actuels > 0):
@@ -2235,6 +2239,8 @@ class Monstre:
             print("C'est encore au tour de ", self.surnom,self.attribut, " : ", "\n")
             self.jauge_attaque+=100
         
+
+
         
     ''' INTRODUIRE VARIABLE 0 ou 1 POUR CAPACITES RESURRECTION ET Fee.DoubleFleche etc. '''
     ''' DANS FONCTION, SELON 0 OU 1, LAISSER LE CHOIX OU NON AU JOUEUR '''
@@ -2431,6 +2437,366 @@ class Monstre:
         #V      Evaluer le tour supplémentaire
         #V      Eventuellement tout recommencer
         '''
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def action_allies_multijoueur(self,team_allies,team_ennemis,statut,adresse_joueur):
+        ''' ACTUALISER TOUTES LES CAPACITES ANORMALES!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! '''
+        ''' FONCTION A OPTIMISER... Faire beaucoup plus de fonctions auxiliaires!!!! '''
+
+        capacites_anormales=[SoldatSquelette.slash,ChauveSouris.ultrason,Lutin.deceleration,OursDeGuerre.rugissement,Salamandre.tremblement,Chevalier.abnegation,OursDeGuerre.abnegation,Elementaire.renforcement,Garuda.resurgir,Garuda.lumiere,Esprit.guerison,Esprit.sphere_spirituelle,Fee.soin,Fee.double_fleche,Fee.pluie_douleur,Fee.benediction,DameHarpie.plumes,DameHarpie.danse,Inugami.coop,Inugami.hurlement,Golem.corps_de_lave,Golem.corps_de_glace,Golem.mur_de_fer,Mastodonte.pluie_de_gravats,Mastodonte.armure_de_glace,Serpent.tsunami,Serpent.orage,Griffon.tornade,Inferno.deflagration,Inferno.orage,Elfe.fleches,Elfe.pluie,ChevalierMagique.projectiles,ChevalierMagique.drain,Griffon.acceleration,Inferno.adrenaline,OursDeCombat.cri,Elfe.strategie,ChevalierMagique.combo,ChevalierMagique.tempete,ChevalierMagique.vortex,Phenix.blizzard,Phenix.tempete,Phenix.purification,Sylphe.tourbillon,Sylphe.nuit,Sylphe.cyclone,Sylphe.blizzard,Sylphe.phenix,Sylphide.bourrasque,Sylphide.bourrasque2,Sylphide.conjuration,Sylphide.bouclier,Sylphide.benediction,Sylphide.benediction_lumiere]
+        capacites_multicibles=[SoldatSquelette.slash,ChauveSouris.ultrason,Lutin.deceleration,OursDeGuerre.rugissement,Salamandre.tremblement,Chevalier.abnegation,Fee.double_fleche,Fee.pluie_douleur,DameHarpie.plumes,Golem.corps_de_lave,Golem.corps_de_glace,Mastodonte.pluie_de_gravats,Serpent.tsunami,Serpent.orage,Griffon.tornade,Inferno.deflagration,Inferno.orage,Elfe.fleches,Elfe.pluie,ChevalierMagique.projectiles,ChevalierMagique.drain,Phenix.blizzard,Phenix.tempete,Phenix.purification,Sylphe.tourbillon,Sylphe.nuit,Sylphe.cyclone,Sylphe.blizzard,Sylphe.phenix]
+        capacites_multicibles_multi_equipes=[Sylphide.bourrasque,Sylphide.bourrasque2] # (sylphe,equipe_ennemie,equipe_alliee)
+        capacites_hit_multicibles=[ChevalierMagique.combo,ChevalierMagique.tempete]
+
+        capacites_soin_allie=[Esprit.guerison,Fee.soin,Sylphide.benediction]
+        capacites_soin_allie_avec_hit=[Esprit.sphere_spirituelle,ChevalierMagique.vortex] # (esprit,Team_allies,cible)
+        capacites_protection_allie=[]
+        capacites_renforcement_allie=[Garuda.resurgir]
+        capacites_resurrection_allie=[Garuda.lumiere] # Prend Team_allies comme argument
+
+        capacites_renforcement_perso=[OursDeGuerre.abnegation,Elementaire.renforcement,Golem.mur_de_fer,Mastodonte.armure_de_glace]
+        capacites_renforcement_equipe=[Fee.benediction,DameHarpie.danse,Inugami.hurlement,Griffon.acceleration,Inferno.adrenaline,OursDeCombat.cri,Elfe.strategie,Sylphide.benediction_lumiere,Sylphide.bouclier,Sylphide.conjuration] # Same
+        capacites_attaque_en_groupe=[Inugami.coop] # (inugami,Team_allies,cible)
+
+        passifs_debut_de_tour=[Serpent.renforcement,Elfe.mouvement_esquive,ChevalierMagique.feu_vengeur]
+        passifs_fin_de_tour=[Chevalier.urgence,Golem.barriere,Mastodonte.peau_dure,Elfe.fin_mouvement_esquive,Vampire.soif_de_sang]
+
+        if (statut == 'serveur'):
+            message_received = listen_a_single_message(adresse_joueur)
+
+        self.tour_supplementaire_tmp+=self.tour_supplementaire
+        if(self.chances_tour_supplementaire > 0):
+            reussite_effet=(random.randint(1,100))/100
+            if(reussite_effet <= self.chances_tour_supplementaire):
+                self.tour_supplementaire_tmp+=1
+
+        print("C'est au tour de ", self.surnom, self.attribut, " : ", "\n")
+        while(self.tour_supplementaire_tmp >= 0):
+            self.debut_de_tour()
+            if(self.pv_actuels > 0):
+                if(self.peut_jouer == 1):
+                    if(team_ennemis.is_alive()):
+                        if((self.presence_passif_1 == 1) and (self.sans_passif <= 0)  and (self.passif_1 in passifs_debut_de_tour)):
+                            self.passif_1(team_allies)
+                        if((self.presence_passif_2 == 1) and (self.sans_passif <= 0)  and (self.passif_2 in passifs_debut_de_tour)):
+                            self.passif_2(team_allies)
+                        if(self.provoque <= 0):
+                            # Réinitialise les positions possibles pour les ennemis
+                            # Doit surement pouvoir s'optimiser avec des .pop et des .append...
+                            place_leader=0
+                            place_membre_1=1
+                            place_membre_2=2
+
+                            if(team_ennemis.len == 1):
+                                positions_ennemis=['du centre']
+                                possibilites_cible=[0]
+                            
+                            elif(team_ennemis.len == 2):
+                                if(team_ennemis.membres[0].pv_actuels <= 0):
+                                    positions_ennemis=['de droite']
+                                    possibilites_cible=[0]
+                                    place_leader=3
+                                    place_membre_1=0
+                                elif(team_ennemis.membres[1].pv_actuels <= 0):
+                                    positions_ennemis=['de gauche']
+                                    possibilites_cible=[0]
+                                    place_membre_1=3
+                                else:
+                                    positions_ennemis=['de gauche','de droite']
+                                    possibilites_cible=[0,1]
+                            
+                            elif(team_ennemis.len == 3):
+                                if(team_ennemis.membres[0].pv_actuels <= 0 and team_ennemis.membres[1].pv_actuels <= 0):
+                                    positions_ennemis=['de droite']
+                                    possibilites_cible=[0]
+                                    place_leader=3
+                                    place_membre_1=3
+                                    place_membre_2=0
+                                elif(team_ennemis.membres[0].pv_actuels <=0 and team_ennemis.membres[2].pv_actuels <= 0):
+                                    positions_ennemis=['du centre']
+                                    possibilites_cible=[0]
+                                    place_leader=3
+                                    place_membre_1=0
+                                    place_membre_2=3
+                                elif(team_ennemis.membres[1].pv_actuels <= 0 and team_ennemis.membres[2].pv_actuels <= 0):
+                                    positions_ennemis=['de gauche']
+                                    possibilites_cible=[0]
+                                    place_leader=0
+                                    place_membre_1=3
+                                    place_membre_2=3
+                                elif(team_ennemis.membres[0].pv_actuels <= 0):
+                                    positions_ennemis=['du centre','de droite']
+                                    possibilites_cible=[0,1]
+                                    place_leader=3
+                                    place_membre_1=0
+                                    place_membre_2=1
+                                elif(team_ennemis.membres[1].pv_actuels <= 0):
+                                    positions_ennemis=['de gauche','de droite']
+                                    possibilites_cible=[0,1]
+                                    place_leader=0
+                                    place_membre_1=3
+                                    place_membre_2=1
+                                elif(team_ennemis.membres[2].pv_actuels <= 0):
+                                    positions_ennemis=['de gauche','du centre']
+                                    possibilites_cible=[0,1]
+                                    place_leader=0
+                                    place_membre_1=1
+                                    place_membre_2=3
+                                else:
+                                    positions_ennemis=['de gauche','du centre','de droite']
+                                    possibilites_cible=[0,1,2]
+                            
+                            
+                            if(place_leader < 3):
+                                print(team_ennemis.membres[0].surnom,positions_ennemis[place_leader],' = ',place_leader,'(',team_ennemis.membres[0].pv_actuels,'PV restants)')
+                            if(team_ennemis.len > 1 and place_membre_1 < 3):
+                                print(team_ennemis.membres[1].surnom,positions_ennemis[place_membre_1],' = ',place_membre_1,'(',team_ennemis.membres[1].pv_actuels,'PV restants)')
+                            if(team_ennemis.len > 2 and place_membre_2 < 3):
+                                print(team_ennemis.membres[2].surnom,positions_ennemis[place_membre_2],' = ',place_membre_2,'(',team_ennemis.membres[2].pv_actuels,'PV restants)')
+                            
+
+                            # A MODIFIER 
+                            # DOIT EN PLUS ETRE TRANSMIS A L'AUTRE JOUEUR
+                            #retour_choix_capacite_speciale = self.choisir_capacite_speciale(fenetre,dimensions_fenetre,team_ennemis,team_allies)
+                            
+                            if (statut == 'client'):
+                                retour_choix_capacite_speciale = self.choisir_capacite_speciale_multijoueur()
+
+                                capacite_choisie = retour_choix_capacite_speciale[0]
+                                indice_capacite_choisie = retour_choix_capacite_speciale[1]
+                                to_return = [indice_capacite_choisie]
+                            elif (statut == 'serveur'):
+                                indice_capacite_choisie = message_received[0]
+                                if (indice_capacite_choisie == 1):
+                                    capacite_choisie=self.capacite1
+                                    self.attente1=self.temps_recharge1
+                                    self.etat_cap1='Non dispo'
+                                elif (indice_capacite_choisie == 2):
+                                    capacite_choisie=self.capacite2
+                                    self.attente2=self.temps_recharge2
+                                    self.etat_cap2='Non dispo'
+                                elif (indice_capacite_choisie == 3):
+                                    capacite_choisie=self.capacite3
+                                    self.attente3=self.temps_recharge3
+                                    self.etat_cap3='Non dispo'
+                                elif (indice_capacite_choisie == 4):
+                                    capacite_choisie=self.capacite4
+                                    self.attente4=self.temps_recharge4
+                                    self.etat_cap4='Non dispo'
+
+                            if((capacite_choisie not in capacites_anormales) or (capacite_choisie in capacites_soin_allie_avec_hit) or (capacite_choisie in capacites_attaque_en_groupe) or (capacite_choisie in capacites_hit_multicibles)):
+                                
+                                if (statut == 'client'):
+                                    entree=input('Quelle cible voulez-vous attaquer ? ')
+                                    while(not Security.is_decimal(entree)):
+                                        entree=input('Quelle cible voulez-vous attaquer ? ')
+                                    indice_cible=int(entree)
+                                    while(indice_cible not in possibilites_cible):
+                                        entree=input('Quelle cible voulez-vous attaquer ? ')
+                                        while(not Security.is_decimal(entree)):
+                                            entree=input('Quelle cible voulez-vous attaquer ? ')
+                                        indice_cible=int(entree)
+                                elif (statut == 'serveur'):
+                                    indice_cible = message_received[1]
+
+                                cible = team_ennemis.membres[indice_cible]
+                                to_return.append(indice_cible)
+
+                                pv_avant_degats=cible.pv_actuels
+                                if ((capacite_choisie not in capacites_soin_allie_avec_hit) and (capacite_choisie not in capacites_attaque_en_groupe) and (capacite_choisie not in capacites_hit_multicibles)):
+                                    capacite_choisie(self,cible)
+                                elif(capacite_choisie in capacites_hit_multicibles):
+                                    capacite_choisie(self,team_ennemis,cible)
+                                else:
+                                    capacite_choisie(self,team_allies,cible)
+                                    
+                                if(cible.reflexion_dommages > 0):
+                                    degats_subis=pv_avant_degats-cible.pv_actuels
+                                    degats_renvoyes=Arrondir.a_l_unite(cible.pourcentage_reflexion_dommages*degats_subis)
+                                    cible.pv_actuels+=degats_renvoyes # oui c'est bien un +
+                                    if(self.immortalite <= 0):
+                                        print('\n',self.surnom,self.attribut,' reçoit la réflexion des dégâts!!')
+                                        print(self.surnom,self.attribut,' subit ',degats_renvoyes,' points de dégâts!!')
+                                        self.pv_actuels-=degats_renvoyes
+                                    else:
+                                        print(self.surnom,self.attribut,'ne subit pas de dégâts grâce à son état d Immortalité!!')
+                                    if(self.pv_actuels <= 0):
+                                        print(self.surnom,self.attribut,' est mort!! \n')
+                                    else:
+                                        print('Il reste ',self.pv_actuels,' point(s) de vie sur',self.pv_max_donjons,' à ',self.surnom,self.attribut,'!! \n')
+                                if(cible.contre_attaque > 0 and cible.pv_actuels > 0):
+                                    if (degats_subis <= 0):
+                                        degats_subis=1
+                                    print('\n',cible.surnom,cible.attribut,' effectue une contre-attaque sur ',self.surnom,self.attribut,'!!')
+                                    if(self.immortalite <= 0):
+                                        pv_attaquant_avant_dommages=self.pv_actuels
+                                        cible.capacite1(cible,self)
+                                        ecart=self.pv_actuels-pv_attaquant_avant_dommages
+                                        self.pv_actuels+=Arrondir.a_l_unite(0.25*ecart) # seulement 75% des dégâts sont subis
+                                    else:
+                                        print(self.surnom,self.attribut,'ne subit pas de dégâts grâce à son état d Immortalité!!')
+                                    if(self.pv_actuels <= 0):
+                                        print(self.surnom,self.attribut,' est mort!! \n')
+                                    else:
+                                        print('Il reste ',self.pv_actuels,' point(s) de vie sur',self.pv_max_donjons,' à ',self.surnom,self.attribut,'!! \n')
+
+                                self.appliquer_passifs_fin_de_tour(cible,team_allies,team_ennemis)
+
+                            else:
+                                if((capacite_choisie in capacites_soin_allie) or (capacite_choisie in capacites_protection_allie) or (capacite_choisie in capacites_renforcement_allie)):
+                                    possibilites_choix_allie=[]
+                                    for index in range(team_allies.len):
+                                        if(team_allies.membres[index].pv_actuels > 0):
+                                            print('Il reste ',team_allies.membres[index].pv_actuels,' PV à l allié ',index,':',team_allies.membres[index].surnom,team_allies.membres[index].attribut,' sur ',team_allies.membres[index].pv_max_donjons)
+                                            possibilites_choix_allie.append(index)
+                                    
+                                    if (statut == 'serveur'):
+                                        choix = message_received[1]
+
+                                    if(capacite_choisie in capacites_soin_allie):
+                                        if (statut == 'client'):
+                                            entree=input('Quel allié voulez-vous soigner ? ')
+                                            while(not Security.is_decimal(entree)):
+                                                entree=input('Quel allié voulez-vous soigner ? ')
+                                            choix=int(entree)
+                                            while(choix not in possibilites_choix_allie):
+                                                entree=input('Quel allié voulez-vous soigner ? ')
+                                                while(not Security.is_decimal(entree)):
+                                                    entree=input('Quel allié voulez-vous soigner ? ')
+                                                choix=int(entree)
+                                        capacite_choisie(self,team_allies.membres[choix])
+                                        
+                                    elif(capacite_choisie in capacites_protection_allie):
+                                        if (statut == 'client'):
+                                            entree=input('Quel allié voulez-vous protéger ? ')
+                                            while(not Security.is_decimal(entree)):
+                                                entree=input('Quel allié voulez-vous protéger ? ')
+                                            choix=int(entree)
+                                            while(choix not in possibilites_choix_allie):
+                                                entree=input('Quel allié voulez-vous protéger ? ')
+                                                while(not Security.is_decimal(entree)):
+                                                    entree=input('Quel allié voulez-vous protéger ? ')
+                                                choix=int(entree)
+                                        capacite_choisie(self,team_allies.membres[choix])
+                                            
+                                    else:
+                                        if (statut == 'client'):
+                                            entree=input('Quel allié voulez-vous renforcer ? ')
+                                            while(not Security.is_decimal(entree)):
+                                                entree=input('Quel allié voulez-vous renforcer ? ')
+                                            choix=int(entree)
+                                            while(choix not in possibilites_choix_allie):
+                                                entree=input('Quel allié voulez-vous renforcer ? ')
+                                                while(not Security.is_decimal(entree)):
+                                                    entree=input('Quel allié voulez-vous renforcer ? ')
+                                                choix=int(entree)
+                                        capacite_choisie(self,team_allies.membres[choix])
+                                    
+                                    if (statut == 'client'):
+                                        to_return.append(choix)
+
+                                if(capacite_choisie in capacites_renforcement_perso):
+                                    capacite_choisie(self)
+
+                                if((capacite_choisie in capacites_resurrection_allie) or (capacite_choisie in capacites_renforcement_equipe)):
+                                    capacite_choisie(team_allies)
+
+                                if(capacite_choisie in capacites_multicibles):
+                                    capacite_choisie(self,team_ennemis)
+
+                                if(capacite_choisie in capacites_multicibles_multi_equipes):
+                                    capacite_choisie(self,team_ennemis,team_allies)
+
+                        else:
+                            if (statut == 'client'):
+                                cible_trouvee = False
+                                for index in range(team_ennemis.len):
+                                    if(team_ennemis.membres[index].indice_provocation > 0):
+                                        cible=team_ennemis.membres[index]
+                                        cible_trouvee = True
+                                        to_return = [1, index]
+                            
+                                if (cible_trouvee == False):
+                                    possibilites_provocation=[]
+                                    for index in range(team_ennemis.len):
+                                        if(team_ennemis.membres[index].pv_actuels > 0):
+                                            possibilites_provocation.append(index)
+                                    indice_provocation=possibilites_provocation[random.randint(0,len(possibilites_provocation)-1)]
+                                    cible=team_ennemis.membres[indice_provocation]
+                                    to_return = [1, indice_provocation]
+                            elif (statut == 'serveur'):
+                                index = message_received[1]
+                                cible = team_ennemis.membres[index]
+
+
+
+                            print(self.surnom,self.attribut,' attaque ',cible.surnom,cible.attribut,' avec sa capacité : ',self.capacite1_nom,' à cause de sa provocation!!\n')
+                            capacite_choisie=self.capacite1
+                            if((capacite_choisie not in capacites_multicibles) and (capacite_choisie not in capacites_soin_allie_avec_hit) and (capacite_choisie not in capacites_hit_multicibles)):
+                                capacite_choisie(self,cible)
+                            elif(capacite_choisie in capacites_soin_allie_avec_hit):
+                                capacite_choisie(self,team_allies,cible)
+                            elif(capacite_choisie in capacites_hit_multicibles):
+                                capacite_choisie(self,team_ennemis,cible)
+                            else:
+                                capacite_choisie(self,team_ennemis)
+
+                            self.appliquer_passifs_fin_de_tour(cible,team_allies,team_ennemis)
+                        self.appliquer_passifs_fin_de_tour_si_pas_offense(team_allies)
+
+                        if (statut == 'client'):
+                            send_a_single_message(adresse_joueur, to_return)
+
+                else:
+                    if(self.tours_sommeil > 0):
+                        print(self.surnom,self.attribut,' est endormi(e)!!\n')
+                    else:
+                        print(self.surnom,self.attribut,' se reprend. \n')
+                    self.peut_jouer=1
+            else:
+                print('\n ',self.surnom,self.attribut,'est mort!! \n')
+            self.tour_supplementaire_tmp-=1
+
+
+        if((self.presence_passif_1 == 1) and (self.sans_passif <= 0)  and (self.passif_1 in passifs_fin_de_tour)):
+            self.passif_1(team_allies)
+        if((self.presence_passif_2 == 1) and (self.sans_passif <= 0)  and (self.passif_2 in passifs_fin_de_tour)):
+            self.passif_2(team_allies)
+
+        self.fin_de_tour()
+        if (self.perturbation_recup <= 0):
+            self.etre_soigne(math.floor((self.regeneration*self.pv_max_donjons)/100))
+        if(self.tour_supplementaire_tmp >= 0):
+            print("C'est encore au tour de ", self.surnom,self.attribut, " : ", "\n")
+            self.jauge_attaque+=100
+
 
 
 
@@ -2984,6 +3350,60 @@ class Monstre:
             self.etat_cap4='Non dispo'
         
         return [capacite_choisie, indice_capacite_choisie, liste_de_messages]
+
+
+
+    def choisir_capacite_speciale_multijoueur(self):
+        print('\n Vous pouvez utiliser l\'une des capacités suivantes : ')
+        possibilites_capacite_speciale=[]
+        
+        if (self.etat_cap1 == 'dispo'):
+            print(self.capacite1_nom,' = 1')
+            possibilites_capacite_speciale.append(1)
+        if(self.silencieux <= 0):
+            if(self.nb_capacites >= 2):
+                if (self.etat_cap2 == 'dispo'):
+                    print(self.capacite2_nom,' = 2')
+                    possibilites_capacite_speciale.append(2)
+            if(self.nb_capacites >= 3):
+                if (self.etat_cap3 == 'dispo'):
+                    print(self.capacite3_nom,' = 3')
+                    possibilites_capacite_speciale.append(3)
+            if(self.nb_capacites >= 4):
+                if (self.etat_cap4 == 'dispo'):
+                    print(self.capacite4_nom,' = 4')
+                    possibilites_capacite_speciale.append(4)
+        
+        
+        entree=input('Quelle capacité voulez-vous utiliser ? ')
+        while(not Security.is_decimal(entree)):
+            entree=input('\nQuelle capacité voulez-vous utiliser ? ')
+        indice_capacite_choisie = int(entree)
+        while(indice_capacite_choisie not in possibilites_capacite_speciale):
+            entree=input('\nQuelle capacité voulez-vous utiliser ? ')
+            while(not Security.is_decimal(entree)):
+                entree=input('\nQuelle capacité voulez-vous utiliser ? ')
+            indice_capacite_choisie = int(entree)
+        
+
+        if (indice_capacite_choisie == 1):
+            capacite_choisie=self.capacite1
+            self.attente1=self.temps_recharge1
+            self.etat_cap1='Non dispo'
+        elif (indice_capacite_choisie == 2):
+            capacite_choisie=self.capacite2
+            self.attente2=self.temps_recharge2
+            self.etat_cap2='Non dispo'
+        elif (indice_capacite_choisie == 3):
+            capacite_choisie=self.capacite3
+            self.attente3=self.temps_recharge3
+            self.etat_cap3='Non dispo'
+        elif (indice_capacite_choisie == 4):
+            capacite_choisie=self.capacite4
+            self.attente4=self.temps_recharge4
+            self.etat_cap4='Non dispo'
+        
+        return [capacite_choisie, indice_capacite_choisie]
 
 
 

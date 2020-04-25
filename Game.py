@@ -17,6 +17,7 @@ from Inventory import *
 from Dungeon import *
 from Teams import *
 from Monsters import Security
+from Server import *
 
 '''
 from Dungeon import *
@@ -530,7 +531,7 @@ class Game:
         
         
     def possibilites(self,equipe_1):
-        menu=['Invoquer','Améliorer ou faire Evoluer un monstre','Partir à l\'aventure','Evaluer le mana et autres pierres transportées','Examiner ou modifier l\'équipe','Améliorer, examiner ou modifier l\'équipement','Accéder aux statistiques des créatures possédées','Ouvrir le sac','Accéder au magasin','En savoir plus sur les Relations Elémentaires','En savoir plus sur les Runes','Sauvegarder et Quitter']
+        menu=['Invoquer','Améliorer ou faire Evoluer un monstre','Partir à l\'aventure','Evaluer le mana et autres pierres transportées','Examiner ou modifier l\'équipe','Améliorer, examiner ou modifier l\'équipement','Accéder aux statistiques des créatures possédées','Ouvrir le sac','Accéder au magasin','En savoir plus sur les Relations Elémentaires','En savoir plus sur les Runes','Sauvegarder et Quitter', 'Jouer en multijoueur']
 
         print('Vous pouvez choisir parmi les options suivantes : ')
         options_possibilites=[]
@@ -1044,6 +1045,12 @@ class Game:
                 print("\n\n\n\n")
                 self.possibilites(equipe_1)
 
+        if (choix == 12):
+            print("\n\n Vous entrez dans le mode multijoueur... \n\n")
+            sac_tmp = Inventaire()
+            game_tmp = Game(sac_tmp)
+            equipe_1.combat_multijoueurs(game_tmp, 'serveur')
+            # volontairement pas de sauvegarde après le mode multijoueur
 
 
 

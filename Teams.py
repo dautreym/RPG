@@ -16,6 +16,9 @@ import random
 '''
 
 from Monsters import *
+from Inventory import *
+from Server import *
+# from Client import *
 
 
 class Equipe:
@@ -569,6 +572,187 @@ class Equipe:
             if(ennemis.membres[index].presence_passif_1 == 1):
                 if(ennemis.membres[index].passif_1 in passifs_fin_de_partie):
                     ennemis.membres[index].passif_1()
+
+        print('Le vainqueur est : ',vainqueur,'!! \n\n')
+        str(input(' > '))
+        return vainqueur
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    # Sert à reset un monstre dans server.py
+    # On ne peut pas importer Monsters dans Server...
+    # Sinon les import bouclent et ça casse tout
+    def reset_equipe(self, nom_monstre_a_reset):
+        return Monstre.reset_monstre(nom_monstre_a_reset)
+            
+
+
+
+
+
+
+
+    '''
+                Ce qu'on veut faire :
+        
+        0)  Le serveur se met en attente d'une connexion client
+
+        1)  Le client initie la connexion en envoyant son premier monstre
+            Le serveur lui répond en lui envoyant son premmier monstre 
+            On recommence jusqu'à ce que le client et le serveur aient envoyé leurs trois monstres
+            Puis on ferme la connexion
+        
+        2)  On rouvre les deux connexions et on écoute
+            Le joueur au monstre le plus rapide va commencer à jouer
+            Il va envoyer un message à l'autre joueur pour lui indiquer 
+                le choix de sa capacité et de sa cible si besoin
+            Cela va réveiller l'autre joueur, le faire se synchroniser dans le jeu
+            Puis on remet les deux joueurs en attente et on recommence
+    '''
+    
+    # Si statut == client, c'est à nous d'initialiser la communication vers le serveur 
+    # Sinon si statut == serveur, on n'a qu'à attendre la connexion du client :)
+    def combat_multijoueurs(self, game, statut):
+        print("Statut dans Teams : " + statut)
+        partie_tmp = game
+        resultat = init_team_ennemie(self,statut)
+        print("FIN DE L INITIALISATION !!!! \n")
+        print(resultat)
+        adresse_joueur = resultat[0]
+        ennemis = Equipe(partie_tmp, resultat[1], len(resultat[1]))
+
+        for index in range(ennemis.len):
+            ennemis.membres[index].preparer_au_combat()
+        for index in range(self.len):
+            self.membres[index].preparer_au_combat()
+
+        passifs_debut_de_partie=[Chevalier.chevalerie,Serpent.coupe_feu,Griffon.bouclier_lumiere,Griffon.bouclier_tenebres,LoupGarou.soif_de_sang]
+        passifs_fin_de_partie=[Griffon.anti_bouclier_tenebres,Griffon.anti_bouclier_lumiere]
+        
+        if(self.membres[0].presence_leader_skill == 1):
+            self.membres[0].leader_skill(self)
+        if(ennemis.membres[0].presence_leader_skill == 1):
+            ennemis.membres[0].leader_skill(ennemis)
+        
+        ''' Pour l'instant, aucun passif_2 dans les passifs de début de partie '''
+        for index in range(self.len):
+            if(self.membres[index].presence_passif_1 == 1):
+                if(self.membres[index].passif_1 in passifs_debut_de_partie):
+                    self.membres[index].passif_1()
+
+        for index in range(ennemis.len):
+            if(ennemis.membres[index].presence_passif_1==1):
+               if(ennemis.membres[index].passif_1 in passifs_debut_de_partie):
+                    ennemis.membres[index].passif_1()
+
+        persos=self.membres + ennemis.membres
+        index=0
+        while(index < len(persos)):
+            # len(persos) peut être modifié par les .pop
+            if(index < len(persos) and persos[index] == 0):
+                persos.pop(index)
+                index-=1
+            index+=1
+
+
+        while(not self.fin_du_combat(ennemis)):
+            while(not self.un_perso_doit_jouer() and not ennemis.un_perso_doit_jouer()):
+                self.tick()
+                ennemis.tick()
+            while((self.un_perso_doit_jouer() or ennemis.un_perso_doit_jouer()) and not self.fin_du_combat(ennemis)):
+                for index_persos in range(len(persos)):
+                    if(persos[index_persos].jauge_attaque >= 100 and not self.fin_du_combat(ennemis)):
+                        print('***** Recapitulatif *****')
+                        for index in range(self.len):
+                            print(persos[index].surnom,persos[index].attribut,' : ',persos[index].pv_actuels,'PV sur',persos[index].pv_max_donjons)
+                            print('Jauge d\'attaque : ',persos[index].jauge_attaque)
+                        print('*************************')
+                        print('\n')
+                        print('*************************')
+                        for index_ennemis in range(ennemis.len):
+                            print(persos[index+index_ennemis+1].surnom,persos[index+index_ennemis+1].attribut,' : ',persos[index+index_ennemis+1].pv_actuels,'PV sur',persos[index+index_ennemis+1].pv_max_donjons)
+                            print('Jauge d\'attaque : ',persos[index+index_ennemis+1].jauge_attaque)
+                        print('*************************')
+                        print('\n')
+
+                        # PAS DE COMPARAISON DES STATS DE VITESSSE POUR DECIDER WTF 
+                        
+                        jauge_max=persos[0].jauge_attaque
+                        indice_du_max=0
+                        for index in range(len(persos)):
+                            if(persos[index].jauge_attaque > jauge_max):
+                                jauge_max=persos[index].jauge_attaque
+                                indice_du_max=index
+                        
+                        # persos = self.membres + ennemis.membres
+                        # Pour le serveur : serveur.equipe + client.equipe    délimité par serveur.equipe.len-1
+                        # Pour le client : client.equipe + serveur.equipe     délimité par client.equipe.len-1
+                        if(indice_du_max <= self.len-1):
+                            if (statut == 'serveur'):
+                                persos[indice_du_max].action_allies_multijoueur(self,ennemis, 'serveur',adresse_joueur)
+                            elif (statut == 'client'):
+                                persos[indice_du_max].action_allies_multijoueur(self,ennemis, 'client',adresse_joueur)
+                        else:
+                            if (statut == 'serveur'):
+                                persos[indice_du_max].action_allies_multijoueur(self,ennemis, 'client',adresse_joueur)
+                            elif (statut == 'client'):
+                                persos[indice_du_max].action_allies_multijoueur(self,ennemis, 'serveur',adresse_joueur)
+    
+                        persos[indice_du_max].tour_supplementaire_tmp=0
+                        self.tick()
+                        ennemis.tick()
+                        
+                        # str(input(' > '))
+
+            if(self.fin_du_combat(ennemis)):
+                print('Le combat est terminé. \n\n')
+        if(self.is_alive()):
+            vainqueur='allies'
+        else:
+            vainqueur='ennemis'
+
+        if(self.membres[0].presence_leader_skill == 1):
+            self.membres[0].anti_leader_skill(self)
+        if(ennemis.membres[0].presence_leader_skill == 1):
+            ennemis.membres[0].anti_leader_skill(ennemis)
+
+        ''' Pour l'instant, aucun passif_2 dans les passifs de fin de partie '''
+        for index in range(self.len):
+            if(self.membres[index].presence_passif_1 == 1):
+                if(self.membres[index].passif_1 in passifs_fin_de_partie):
+                    self.membres[index].passif_1()
+        
+        for index in range(ennemis.len):
+            if(ennemis.membres[index].presence_passif_1 == 1):
+                if(ennemis.membres[index].passif_1 in passifs_fin_de_partie):
+                    ennemis.membres[index].passif_1()
+
 
         print('Le vainqueur est : ',vainqueur,'!! \n\n')
         str(input(' > '))
