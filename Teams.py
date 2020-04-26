@@ -635,6 +635,10 @@ class Equipe:
             Cela va réveiller l'autre joueur, le faire se synchroniser dans le jeu
             Puis on remet les deux joueurs en attente et on recommence
     '''
+
+    #                       PROBLEME HYPER IMPORTANT
+    
+    #               Si un coup critique survient chez l'un des joueurs et pas chez l'autre ???
     
     # Si statut == client, c'est à nous d'initialiser la communication vers le serveur 
     # Sinon si statut == serveur, on n'a qu'à attendre la connexion du client :)
@@ -703,26 +707,34 @@ class Equipe:
 
                         # PAS DE COMPARAISON DES STATS DE VITESSSE POUR DECIDER WTF 
                         
-                        jauge_max=persos[0].jauge_attaque
-                        indice_du_max=0
+                        vitesse_actuelle_max = persos[0].vitesse_actuelle
+                        jauge_max = persos[0].jauge_attaque
+                        indice_du_max = 0
                         for index in range(len(persos)):
-                            if(persos[index].jauge_attaque > jauge_max):
-                                jauge_max=persos[index].jauge_attaque
-                                indice_du_max=index
+                            if(persos[index].jauge_attaque > jauge_max or (persos[index].jauge_attaque == jauge_max and persos[index].vitesse_actuelle > vitesse_actuelle_max) or (persos[index].jauge_attaque == jauge_max and persos[index].vitesse_actuelle == vitesse_actuelle_max and index > self.len-1)):
+                                print("\n A l'index " + str(index) + " : " + persos[index].nom + " a une jauge d'attaque de " + str(persos[index].jauge_attaque) + " ce qui est > " + str(jauge_max) + " (jauge max).")
+                                jauge_max = persos[index].jauge_attaque
+                                vitesse_actuelle_max = persos[index].vitesse_actuelle
+                                indice_du_max = index
                         
                         # persos = self.membres + ennemis.membres
                         # Pour le serveur : serveur.equipe + client.equipe    délimité par serveur.equipe.len-1
                         # Pour le client : client.equipe + serveur.equipe     délimité par client.equipe.len-1
+                        print("Persos : ")
+                        print(persos)
+                        print("\n\n Indice du max : " + str(indice_du_max) + "\n\n")
+                        
                         if(indice_du_max <= self.len-1):
                             if (statut == 'serveur'):
-                                persos[indice_du_max].action_allies_multijoueur(self,ennemis, 'serveur',adresse_joueur)
+                                persos[indice_du_max].action_allies_multijoueur(self, ennemis, statut, 'client',adresse_joueur)
                             elif (statut == 'client'):
-                                persos[indice_du_max].action_allies_multijoueur(self,ennemis, 'client',adresse_joueur)
+                                persos[indice_du_max].action_allies_multijoueur(ennemis, self, statut, 'serveur',adresse_joueur)
                         else:
+                            # A ré inverser si ça marche pas 
                             if (statut == 'serveur'):
-                                persos[indice_du_max].action_allies_multijoueur(self,ennemis, 'client',adresse_joueur)
+                                persos[indice_du_max].action_allies_multijoueur(self, ennemis, statut, 'serveur',adresse_joueur)
                             elif (statut == 'client'):
-                                persos[indice_du_max].action_allies_multijoueur(self,ennemis, 'serveur',adresse_joueur)
+                                persos[indice_du_max].action_allies_multijoueur(ennemis, self, statut, 'client',adresse_joueur)
     
                         persos[indice_du_max].tour_supplementaire_tmp=0
                         self.tick()
