@@ -19,7 +19,7 @@ port_client = 17777*3
 
 
 def init_team_ennemie(equipe, statut):
-    print("Statut : " + statut + "\n\n")
+    # print("Statut : " + statut + "\n\n")
     if (statut == 'serveur'):
         connexion = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         connexion.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -75,9 +75,9 @@ def init_team_ennemie(equipe, statut):
                     while (monstre.niveau < charToNumber(niveau_monstre)):
                         monstre.monter_en_niveau_sans_affichage()
 
-                    print("\n\n Monstre reçu côté serveur : ")
-                    print(monstre)
-                    print("\n\n")
+                    # print("\n\n Monstre reçu côté serveur : ")
+                    # print(monstre)
+                    # print("\n\n")
                     liste_de_monstres.append(monstre)
                     if (len(liste_de_monstres) == 3):
                         continuer = False
@@ -169,9 +169,9 @@ def init_team_ennemie(equipe, statut):
                     while (monstre.niveau < charToNumber(niveau_monstre)):
                         monstre.monter_en_niveau_sans_affichage()
 
-                    print("\n\n Monstre reçu côté client : ")
-                    print(monstre)
-                    print("\n\n")
+                    # print("\n\n Monstre reçu côté client : ")
+                    # print(monstre)
+                    # print("\n\n")
                     liste_de_monstres.append(monstre)
                     if (len(liste_de_monstres) == 3):
                         continuer = False
@@ -223,18 +223,18 @@ def listen_a_single_message(address_J2, statut_initial):
     #if (statut_initial == 'client'):
     #    address_J2 = (client, port_client)
 
-    print ("\n\n Adresse reçue : ")
-    print(address_J2)
-    print("\n\n")
+    # print ("\n\n Adresse reçue : ")
+    # print(address_J2)
+    # print("\n\n")
 
     if (statut_initial == 'client'):
         port_to_listen = port_client
     elif (statut_initial == 'serveur'):
         port_to_listen = port
 
-    print ("\n\n Port to listen : ")
-    print(str(port_to_listen))
-    print("\n\n")
+    # print ("\n\n Port to listen : ")
+    # print(str(port_to_listen))
+    # print("\n\n")
 
     connexion = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     connexion.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -258,6 +258,7 @@ def listen_a_single_message(address_J2, statut_initial):
         return to_return
 
     else:
+        '''
         print ("\n\n Adresse attendue : ")
         print(address_J2)
         print("\n\n")
@@ -265,34 +266,35 @@ def listen_a_single_message(address_J2, statut_initial):
         print(address)
         print("\n\n")
         exit(0)
+        '''
 
 
 # l'adresse donnée en paramètre est un couple (adresse IP, port)
 def send_a_single_message(address, message, statut_initial):
-    print ("\n\n Adresse reçue pour envoi : ")
-    print(address)
-    print("\n\n")
+    # print ("\n\n Adresse reçue pour envoi : ")
+    # print(address)
+    # print("\n\n")
 
     if (statut_initial == "serveur"):
         address = (client, port_client)
     elif (statut_initial == "client"):
         address = (address[0], port)
 
-    print ("\n\n Nouvelle adresse reçue pour envoi : ")
-    print(address)
-    print("\n\n")
+    # print ("\n\n Nouvelle adresse reçue pour envoi : ")
+    # print(address)
+    # print("\n\n")
 
     connexion = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    print("\n Début connexion \n")
+    # print("\n Début connexion \n")
     connexion.connect(address)
-    print("\n Bien connecté \n")
+    # print("\n Bien connecté \n")
 
     to_send = bytes(str(message), encoding = "utf-8")
     to_send = bytes(to_send.decode("utf-8"), encoding = "utf-8")
-    print("\n Début envoi \n")
+    # print("\n Début envoi \n")
     connexion.send(to_send)
 
-    print("\n Bien envoyé \n")
+    # print("\n Bien envoyé \n")
 
     connexion.shutdown(socket.SHUT_RDWR)
     connexion.close()

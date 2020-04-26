@@ -38,6 +38,9 @@ Les instances de classe (objets) commencent par une minuscule et s'ensuivent par
 '''
 
 
+# A CHANGER A CHAQUE FOIS 
+# Fixe tous les random à venir du côté du joueur et du client 
+random.seed(42)
 
 sac=Inventaire()
 partie=Game(sac)

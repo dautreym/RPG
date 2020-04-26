@@ -2478,7 +2478,7 @@ class Monstre:
         print(team_ennemis.membres[2])
         '''
 
-        print("\n Statut actuel : " + statut + "\n Statut initial : " + statut_initial + "\n")
+        # print("\n Statut actuel : " + statut + "\n Statut initial : " + statut_initial + "\n")
         
         capacites_anormales=[SoldatSquelette.slash,ChauveSouris.ultrason,Lutin.deceleration,OursDeGuerre.rugissement,Salamandre.tremblement,Chevalier.abnegation,OursDeGuerre.abnegation,Elementaire.renforcement,Garuda.resurgir,Garuda.lumiere,Esprit.guerison,Esprit.sphere_spirituelle,Fee.soin,Fee.double_fleche,Fee.pluie_douleur,Fee.benediction,DameHarpie.plumes,DameHarpie.danse,Inugami.coop,Inugami.hurlement,Golem.corps_de_lave,Golem.corps_de_glace,Golem.mur_de_fer,Mastodonte.pluie_de_gravats,Mastodonte.armure_de_glace,Serpent.tsunami,Serpent.orage,Griffon.tornade,Inferno.deflagration,Inferno.orage,Elfe.fleches,Elfe.pluie,ChevalierMagique.projectiles,ChevalierMagique.drain,Griffon.acceleration,Inferno.adrenaline,OursDeCombat.cri,Elfe.strategie,ChevalierMagique.combo,ChevalierMagique.tempete,ChevalierMagique.vortex,Phenix.blizzard,Phenix.tempete,Phenix.purification,Sylphe.tourbillon,Sylphe.nuit,Sylphe.cyclone,Sylphe.blizzard,Sylphe.phenix,Sylphide.bourrasque,Sylphide.bourrasque2,Sylphide.conjuration,Sylphide.bouclier,Sylphide.benediction,Sylphide.benediction_lumiere]
         capacites_multicibles=[SoldatSquelette.slash,ChauveSouris.ultrason,Lutin.deceleration,OursDeGuerre.rugissement,Salamandre.tremblement,Chevalier.abnegation,Fee.double_fleche,Fee.pluie_douleur,DameHarpie.plumes,Golem.corps_de_lave,Golem.corps_de_glace,Mastodonte.pluie_de_gravats,Serpent.tsunami,Serpent.orage,Griffon.tornade,Inferno.deflagration,Inferno.orage,Elfe.fleches,Elfe.pluie,ChevalierMagique.projectiles,ChevalierMagique.drain,Phenix.blizzard,Phenix.tempete,Phenix.purification,Sylphe.tourbillon,Sylphe.nuit,Sylphe.cyclone,Sylphe.blizzard,Sylphe.phenix]
@@ -2603,7 +2603,7 @@ class Monstre:
                                 capacite_choisie = retour_choix_capacite_speciale[0]
                                 indice_capacite_choisie = retour_choix_capacite_speciale[1]
                                 to_return = [indice_capacite_choisie]
-                                print('Capacité choisie : ' + str(capacite_choisie))
+                                # print('Capacité choisie : ' + str(capacite_choisie))
 
                             elif (statut == 'serveur'):
                                 indice_capacite_choisie = message_received[0]
@@ -2623,9 +2623,9 @@ class Monstre:
                                     capacite_choisie=self.capacite4
                                     self.attente4=self.temps_recharge4
                                     self.etat_cap4='Non dispo'
-                                else:
-                                    print("\n\nIndice capacité choisie : " + str(indice_capacite_choisie) + "\n\n")
-                                print('Capacité choisie : ' + str(capacite_choisie))
+                                # else:
+                                #     print("\n\nIndice capacité choisie : " + str(indice_capacite_choisie) + "\n\n")
+                                # print('Capacité choisie : ' + str(capacite_choisie))
 
                             if((capacite_choisie not in capacites_anormales) or (capacite_choisie in capacites_soin_allie_avec_hit) or (capacite_choisie in capacites_attaque_en_groupe) or (capacite_choisie in capacites_hit_multicibles)):
                                 

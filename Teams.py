@@ -524,10 +524,12 @@ class Equipe:
                         # PAS DE COMPARAISON DES STATS DE VITESSSE POUR DECIDER WTF 
                         
                         jauge_max=persos[0].jauge_attaque
+                        vitesse_actuelle_max = persos[0].vitesse_actuelle
                         indice_du_max=0
                         for index in range(len(persos)):
-                            if(persos[index].jauge_attaque > jauge_max):
+                            if(persos[index].jauge_attaque > jauge_max or (persos[index].jauge_attaque == jauge_max and persos[index].vitesse_actuelle > vitesse_actuelle_max)):
                                 jauge_max=persos[index].jauge_attaque
+                                vitesse_actuelle_max = persos[index].vitesse_actuelle
                                 indice_du_max=index
                         if(indice_du_max <= self.len-1):
                             # retour_action=Monstre.action_allies(persos[indice_du_max],allies,ennemis,allies_morts,ennemis_morts)
@@ -643,11 +645,11 @@ class Equipe:
     # Si statut == client, c'est à nous d'initialiser la communication vers le serveur 
     # Sinon si statut == serveur, on n'a qu'à attendre la connexion du client :)
     def combat_multijoueurs(self, game, statut):
-        print("Statut dans Teams : " + statut)
+        # print("Statut dans Teams : " + statut)
         partie_tmp = game
         resultat = init_team_ennemie(self,statut)
-        print("FIN DE L INITIALISATION !!!! \n")
-        print(resultat)
+        # print("FIN DE L INITIALISATION !!!! \n")
+        # print(resultat)
         adresse_joueur = resultat[0]
         ennemis = Equipe(partie_tmp, resultat[1], len(resultat[1]))
 
@@ -711,8 +713,8 @@ class Equipe:
                         jauge_max = persos[0].jauge_attaque
                         indice_du_max = 0
                         for index in range(len(persos)):
-                            if(persos[index].jauge_attaque > jauge_max or (persos[index].jauge_attaque == jauge_max and persos[index].vitesse_actuelle > vitesse_actuelle_max) or (persos[index].jauge_attaque == jauge_max and persos[index].vitesse_actuelle == vitesse_actuelle_max and index > self.len-1)):
-                                print("\n A l'index " + str(index) + " : " + persos[index].nom + " a une jauge d'attaque de " + str(persos[index].jauge_attaque) + " ce qui est > " + str(jauge_max) + " (jauge max).")
+                            if(persos[index].jauge_attaque > jauge_max or (persos[index].jauge_attaque == jauge_max and persos[index].vitesse_actuelle > vitesse_actuelle_max) or (persos[index].jauge_attaque == jauge_max and persos[index].vitesse_actuelle == vitesse_actuelle_max and index > self.len-1 and statut == 'client') or (persos[index].jauge_attaque == jauge_max and persos[index].vitesse_actuelle == vitesse_actuelle_max and index <= self.len-1 and statut == 'serveur')):
+                                # print("\n A l'index " + str(index) + " : " + persos[index].nom + " a une jauge d'attaque de " + str(persos[index].jauge_attaque) + " ce qui est > " + str(jauge_max) + " (jauge max).")
                                 jauge_max = persos[index].jauge_attaque
                                 vitesse_actuelle_max = persos[index].vitesse_actuelle
                                 indice_du_max = index
@@ -720,21 +722,36 @@ class Equipe:
                         # persos = self.membres + ennemis.membres
                         # Pour le serveur : serveur.equipe + client.equipe    délimité par serveur.equipe.len-1
                         # Pour le client : client.equipe + serveur.equipe     délimité par client.equipe.len-1
-                        print("Persos : ")
-                        print(persos)
-                        print("\n\n Indice du max : " + str(indice_du_max) + "\n\n")
+                        # print("Persos : ")
+                        # print(persos)
+                        # print("\n\n Indice du max : " + str(indice_du_max) + "\n\n")
                         
+
+                        if (statut == 'client'):
+                            if (indice_du_max <= self.len-1):
+                                persos[indice_du_max].action_allies_multijoueur(self, ennemis, statut, 'client',adresse_joueur)
+                            else:
+                                persos[indice_du_max].action_allies_multijoueur(ennemis, self, statut, 'serveur',adresse_joueur)
+                        elif (statut == 'serveur'):
+                            if (indice_du_max <= self.len-1):
+                                persos[indice_du_max].action_allies_multijoueur(self, ennemis, statut, 'client',adresse_joueur)
+                            else:
+                                persos[indice_du_max].action_allies_multijoueur(ennemis, self, statut, 'serveur',adresse_joueur)
+
+                        '''
                         if(indice_du_max <= self.len-1):
                             if (statut == 'serveur'):
                                 persos[indice_du_max].action_allies_multijoueur(self, ennemis, statut, 'client',adresse_joueur)
                             elif (statut == 'client'):
                                 persos[indice_du_max].action_allies_multijoueur(ennemis, self, statut, 'serveur',adresse_joueur)
+                                # persos[indice_du_max].action_allies_multijoueur(self, ennemis, statut, 'serveur',adresse_joueur)
                         else:
                             # A ré inverser si ça marche pas 
                             if (statut == 'serveur'):
-                                persos[indice_du_max].action_allies_multijoueur(self, ennemis, statut, 'serveur',adresse_joueur)
+                                persos[indice_du_max].action_allies_multijoueur(ennemis, self, statut, 'serveur',adresse_joueur)
+                                # persos[indice_du_max].action_allies_multijoueur(self, ennemis, statut, 'serveur',adresse_joueur)
                             elif (statut == 'client'):
-                                persos[indice_du_max].action_allies_multijoueur(ennemis, self, statut, 'client',adresse_joueur)
+                        '''     
     
                         persos[indice_du_max].tour_supplementaire_tmp=0
                         self.tick()
