@@ -36,7 +36,7 @@ Les méthodes sont toujours en minuscules avec des underscores ex. est_full_base
 Les instances de classe (objets) commencent par une minuscule et s'ensuivent par des majuscules ex. petitSlime
 '''
 
-# A CHANGER A CHAQUE FOIS 
+# A CHANGER (pas ouf comme pattern)
 # Fixe tous les random à venir du côté du joueur et du client 
 random.seed(42)
 
