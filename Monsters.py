@@ -13,7 +13,7 @@ import sys
 from ast import literal_eval
 
 from Graphism_ForetVeur import *
-from Server import *
+#from Server import *
 
 #from Runes_and_Objects import *
 #from Dungeon import *

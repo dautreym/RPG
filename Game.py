@@ -17,7 +17,7 @@ from Inventory import *
 from Dungeon import *
 from Teams import *
 from Monsters import Security
-from Server import *
+#from Server import *
 
 '''
 from Dungeon import *

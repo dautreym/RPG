@@ -17,7 +17,7 @@ import random
 
 from Monsters import *
 from Inventory import *
-from Server import *
+#from Server import *
 # from Client import *
 
 
